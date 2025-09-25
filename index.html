@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football Alumni Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Football Alumni Game</h1>
+            <p>Guess which college these NFL players attended!</p>
+        </header>
+        
+        <div class="game-area">
+            <div class="score-section">
+                <div class="score">Score: <span id="score">0</span></div>
+                <div class="guesses">Guesses left: <span id="guesses-left">3</span></div>
+            </div>
+            
+            <div class="player-section">
+                <div class="player-image">
+                    <img id="player-img" src="" alt="NFL Player" />
+                </div>
+                <div class="player-info">
+                    <h2 id="player-name">Loading...</h2>
+                </div>
+            </div>
+            
+            <div class="guess-section">
+                <input type="text" id="guess-input" placeholder="Enter college name..." maxlength="50">
+                <button id="submit-guess">Submit Guess</button>
+            </div>
+            
+            <div class="feedback-section">
+                <div id="feedback" class="feedback"></div>
+                <div id="previous-guesses" class="previous-guesses"></div>
+            </div>
+            
+            <div class="game-controls">
+                <button id="next-player" class="hidden">Next Player</button>
+                <button id="restart-game" class="hidden">Restart Game</button>
+            </div>
+        </div>
+        
+        <div class="game-over" id="game-over" class="hidden">
+            <h2>Game Over!</h2>
+            <p>Final Score: <span id="final-score">0</span></p>
+            <button id="play-again">Play Again</button>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
