@@ -45,9 +45,32 @@ header p {
 .score-section {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 25px;
+    margin-bottom: 15px;
     font-size: 1.1rem;
     font-weight: bold;
+}
+
+.running-score-section {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 25px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: bold;
+}
+
+.correct-answers {
+    color: #28a745;
+}
+
+.incorrect-answers {
+    color: #dc3545;
+}
+
+.total-players {
+    color: #6c757d;
 }
 
 .score {
@@ -87,11 +110,47 @@ header p {
     gap: 10px;
     margin-bottom: 25px;
     justify-content: center;
+    align-items: flex-start;
+}
+
+.college-dropdown-container {
+    position: relative;
+    flex: 1;
+    max-width: 300px;
+}
+
+.college-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-option {
+    padding: 10px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+}
+
+.dropdown-option:hover {
+    background-color: #f8f9fa;
+}
+
+.dropdown-option:last-child {
+    border-bottom: none;
 }
 
 #guess-input {
-    flex: 1;
-    max-width: 300px;
+    width: 100%;
     padding: 12px;
     font-size: 1rem;
     border: 2px solid #ddd;

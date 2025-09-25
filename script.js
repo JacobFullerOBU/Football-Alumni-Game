@@ -489,17 +489,27 @@ const players = [
 // Game state
 let currentPlayer = null;
 let score = 0;
+let correctAnswers = 0;
+let incorrectAnswers = 0;
+let totalPlayers = 0;
 let guessesLeft = 3;
 let previousGuesses = [];
 let gameActive = true;
 let usedPlayers = [];
 
+// Extract unique colleges for dropdown
+const uniqueColleges = [...new Set(players.map(player => player.college))].sort();
+
 // DOM elements
 const scoreElement = document.getElementById('score');
+const correctCountElement = document.getElementById('correct-count');
+const incorrectCountElement = document.getElementById('incorrect-count');
+const totalCountElement = document.getElementById('total-count');
 const guessesLeftElement = document.getElementById('guesses-left');
 const playerImgElement = document.getElementById('player-img');
 const playerNameElement = document.getElementById('player-name');
 const guessInputElement = document.getElementById('guess-input');
+const collegeDropdownElement = document.getElementById('college-dropdown');
 const submitGuessButton = document.getElementById('submit-guess');
 const feedbackElement = document.getElementById('feedback');
 const previousGuessesElement = document.getElementById('previous-guesses');
@@ -512,17 +522,28 @@ const playAgainButton = document.getElementById('play-again');
 // Initialize game
 function initGame() {
     score = 0;
+    correctAnswers = 0;
+    incorrectAnswers = 0;
+    totalPlayers = 0;
     usedPlayers = [];
     gameActive = true;
     gameOverElement.classList.add('hidden');
     document.querySelector('.game-area').classList.remove('hidden');
     updateScore();
+    updateRunningScore();
     loadNextPlayer();
 }
 
 // Update score display
 function updateScore() {
     scoreElement.textContent = score;
+}
+
+// Update running score display
+function updateRunningScore() {
+    correctCountElement.textContent = correctAnswers;
+    incorrectCountElement.textContent = incorrectAnswers;
+    totalCountElement.textContent = totalPlayers;
 }
 
 // Update guesses left display
@@ -571,11 +592,50 @@ function clearFeedback() {
     previousGuessesElement.textContent = '';
 }
 
+// Populate college dropdown
+function populateCollegeDropdown(filter = '') {
+    collegeDropdownElement.innerHTML = '';
+    
+    const filteredColleges = uniqueColleges.filter(college => 
+        college.toLowerCase().includes(filter.toLowerCase())
+    );
+    
+    if (filteredColleges.length === 0) {
+        collegeDropdownElement.classList.add('hidden');
+        return;
+    }
+    
+    filteredColleges.slice(0, 10).forEach(college => { // Limit to 10 results
+        const option = document.createElement('div');
+        option.className = 'dropdown-option';
+        option.textContent = college;
+        option.addEventListener('click', () => selectCollege(college));
+        collegeDropdownElement.appendChild(option);
+    });
+    
+    collegeDropdownElement.classList.remove('hidden');
+}
+
+// Select college from dropdown
+function selectCollege(college) {
+    guessInputElement.value = college;
+    collegeDropdownElement.classList.add('hidden');
+    guessInputElement.focus();
+}
+
+// Hide dropdown
+function hideDropdown() {
+    setTimeout(() => { // Delay to allow click events on dropdown options
+        collegeDropdownElement.classList.add('hidden');
+    }, 150);
+}
+
 // Enable guessing input
 function enableGuessing() {
     guessInputElement.disabled = false;
     submitGuessButton.disabled = false;
     guessInputElement.value = '';
+    collegeDropdownElement.classList.add('hidden');
     guessInputElement.focus();
 }
 
@@ -583,6 +643,7 @@ function enableGuessing() {
 function disableGuessing() {
     guessInputElement.disabled = true;
     submitGuessButton.disabled = true;
+    collegeDropdownElement.classList.add('hidden');
 }
 
 // Normalize text for comparison
@@ -685,6 +746,8 @@ function submitGuess() {
     if (isCorrectGuess(guess, currentPlayer.college)) {
         // Correct guess
         score += guessesLeft + 1; // More points for fewer guesses
+        correctAnswers++;
+        totalPlayers++;
         feedbackElement.textContent = `Correct! ${currentPlayer.name} attended ${currentPlayer.college}.`;
         feedbackElement.className = 'feedback correct';
         
@@ -700,6 +763,8 @@ function submitGuess() {
             guessInputElement.value = '';
         } else {
             // No guesses left
+            incorrectAnswers++;
+            totalPlayers++;
             feedbackElement.textContent = `No more guesses! ${currentPlayer.name} attended ${currentPlayer.college}.`;
             feedbackElement.className = 'feedback incorrect';
             disableGuessing();
@@ -709,6 +774,7 @@ function submitGuess() {
     }
     
     updateScore();
+    updateRunningScore();
     updateGuessesLeft();
 }
 
@@ -728,6 +794,24 @@ guessInputElement.addEventListener('keypress', function(e) {
         submitGuess();
     }
 });
+
+// Dropdown functionality for college search
+guessInputElement.addEventListener('input', function(e) {
+    const filter = e.target.value;
+    if (filter.length > 0) {
+        populateCollegeDropdown(filter);
+    } else {
+        collegeDropdownElement.classList.add('hidden');
+    }
+});
+
+guessInputElement.addEventListener('focus', function(e) {
+    if (e.target.value.length > 0) {
+        populateCollegeDropdown(e.target.value);
+    }
+});
+
+guessInputElement.addEventListener('blur', hideDropdown);
 
 nextPlayerButton.addEventListener('click', loadNextPlayer);
 
