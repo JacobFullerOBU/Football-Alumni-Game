@@ -1,5 +1,5 @@
 // NFL Players database with college information (2000-Present)
-const players = [
+let players = [
     // Hall of Fame Quarterbacks
     {
         name: "Tom Brady",
@@ -486,6 +486,36 @@ const players = [
     }
 ];
 
+// Function to load players from CSV file
+async function loadPlayersFromCSV() {
+    try {
+        const response = await fetch('players.csv');
+        const csvText = await response.text();
+        
+        // Parse CSV manually (simple parser for our format)
+        const lines = csvText.trim().split('\n');
+        const headers = lines[0].split(',');
+        
+        for (let i = 1; i < lines.length; i++) {
+            const line = lines[i];
+            if (!line.trim()) continue;
+            
+            const values = line.split(',');
+            const player = {
+                name: values[0],
+                college: values[1],
+                image: values[2]
+            };
+            players.push(player);
+        }
+        
+        console.log(`Loaded ${lines.length - 1} players from CSV`);
+    } catch (error) {
+        console.error('Error loading CSV:', error);
+        // Continue with hardcoded players if CSV fails to load
+    }
+}
+
 // Game state
 let currentPlayer = null;
 let score = 0;
@@ -497,8 +527,8 @@ let previousGuesses = [];
 let gameActive = true;
 let usedPlayers = [];
 
-// Extract unique colleges for dropdown
-const uniqueColleges = [...new Set(players.map(player => player.college))].sort();
+// Extract unique colleges for dropdown (will be updated after CSV loads)
+let uniqueColleges = [...new Set(players.map(player => player.college))].sort();
 
 // DOM elements
 const scoreElement = document.getElementById('score');
@@ -520,7 +550,13 @@ const finalScoreElement = document.getElementById('final-score');
 const playAgainButton = document.getElementById('play-again');
 
 // Initialize game
-function initGame() {
+async function initGame() {
+    // Load players from CSV file
+    await loadPlayersFromCSV();
+    
+    // Update unique colleges list after loading CSV
+    uniqueColleges = [...new Set(players.map(player => player.college))].sort();
+    
     score = 0;
     correctAnswers = 0;
     incorrectAnswers = 0;

@@ -35,4 +35,22 @@ The site is automatically deployed to GitHub Pages using GitHub Actions when cha
 - `index.html` - Main game interface
 - `script.js` - Game logic and player data
 - `style.css` - Styling and responsive design
+- `players.csv` - External CSV file with additional NFL players
 - `.github/workflows/deploy.yml` - GitHub Pages deployment workflow
+
+## 📝 Adding More Players
+
+You can easily add more players to the game by editing the `players.csv` file. The CSV format is:
+
+```csv
+name,college,image
+Player Name,College Name,Image URL
+```
+
+Example:
+```csv
+name,college,image
+Cooper Kupp,Eastern Washington,https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80
+```
+
+The game will automatically load and merge players from the CSV file with the hardcoded players when the page loads.
