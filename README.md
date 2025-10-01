@@ -43,14 +43,19 @@ The site is automatically deployed to GitHub Pages using GitHub Actions when cha
 You can easily add more players to the game by editing the `players.csv` file. The CSV format is:
 
 ```csv
-name,college,image
-Player Name,College Name,Image URL
+name,college
+Player Name,College Name
 ```
 
 Example:
 ```csv
-name,college,image
-Cooper Kupp,Eastern Washington,https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80
+name,college
+Cooper Kupp,Eastern Washington
+Saquon Barkley,Penn State
 ```
 
 The game will automatically load and merge players from the CSV file with the hardcoded players when the page loads.
+
+### Player Images
+
+Player images are automatically generated with unique, colorful avatars displaying each player's initials. The avatar colors are consistently generated based on the player's name, so each player always has the same color. This provides a visually appealing and consistent experience without requiring external image URLs or API keys.

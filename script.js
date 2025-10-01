@@ -1,488 +1,431 @@
+// Helper function to generate player image URL
+function generatePlayerImageURL(playerName) {
+    // Generate player initials
+    const initials = playerName
+        .split(' ')
+        .map(word => word[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2); // Use first 2 initials
+    
+    // Generate a consistent color based on the name
+    let hash = 0;
+    for (let i = 0; i < playerName.length; i++) {
+        hash = playerName.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    
+    // Generate HSL color with good contrast
+    const hue = Math.abs(hash % 360);
+    const saturation = 65;
+    const lightness = 45;
+    
+    // Create SVG with initials
+    const svg = `
+        <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="200" height="200" fill="hsl(${hue}, ${saturation}%, ${lightness}%)"/>
+            <text x="100" y="100" font-family="Arial, sans-serif" font-size="60" font-weight="bold" 
+                  text-anchor="middle" dominant-baseline="central" fill="white">
+                ${initials}
+            </text>
+        </svg>
+    `.trim();
+    
+    // Return as data URL
+    return 'data:image/svg+xml;base64,' + btoa(svg);
+}
+
 // NFL Players database with college information (2000-Present)
 let players = [
     // Hall of Fame Quarterbacks
     {
         name: "Tom Brady",
-        college: "Michigan",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Michigan"
     },
     {
         name: "Peyton Manning",
-        college: "Tennessee",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Tennessee"
     },
     {
         name: "Aaron Rodgers",
-        college: "California",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "California"
     },
     {
         name: "Drew Brees",
-        college: "Purdue",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Purdue"
     },
     {
         name: "Brett Favre",
-        college: "Southern Mississippi",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Southern Mississippi"
     },
     
     // Current Star Quarterbacks
     {
         name: "Patrick Mahomes",
-        college: "Texas Tech",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Texas Tech"
     },
     {
         name: "Josh Allen",
-        college: "Wyoming",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Wyoming"
     },
     {
         name: "Lamar Jackson",
-        college: "Louisville",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Louisville"
     },
     {
         name: "Dak Prescott",
-        college: "Mississippi State",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Mississippi State"
     },
     {
         name: "Russell Wilson",
-        college: "Wisconsin",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Wisconsin"
     },
     {
         name: "Kyler Murray",
-        college: "Oklahoma",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Oklahoma"
     },
     {
         name: "Joe Burrow",
-        college: "LSU",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "LSU"
     },
     {
         name: "Justin Herbert",
-        college: "Oregon",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Oregon"
     },
     {
         name: "Tua Tagovailoa",
-        college: "Alabama",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Alabama"
     },
     {
         name: "Jalen Hurts",
-        college: "Oklahoma",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Oklahoma"
     },
 
     // Elite Running Backs
     {
         name: "Christian McCaffrey",
-        college: "Stanford",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Stanford"
     },
     {
         name: "Derrick Henry",
-        college: "Alabama",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Alabama"
     },
     {
         name: "Alvin Kamara",
-        college: "Tennessee",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Tennessee"
     },
     {
         name: "Nick Chubb",
-        college: "Georgia",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Georgia"
     },
     {
         name: "Saquon Barkley",
-        college: "Penn State",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Penn State"
     },
     {
         name: "Ezekiel Elliott",
-        college: "Ohio State",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Ohio State"
     },
     {
         name: "Adrian Peterson",
-        college: "Oklahoma",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Oklahoma"
     },
     {
         name: "LaDainian Tomlinson",
-        college: "TCU",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "TCU"
     },
     {
         name: "Frank Gore",
-        college: "Miami",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Miami"
     },
     {
         name: "Marshawn Lynch",
-        college: "California",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "California"
     },
 
     // Elite Wide Receivers
     {
         name: "Cooper Kupp",
-        college: "Eastern Washington",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Eastern Washington"
     },
     {
         name: "Davante Adams",
-        college: "Fresno State",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Fresno State"
     },
     {
         name: "Tyreek Hill",
-        college: "West Alabama",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "West Alabama"
     },
     {
         name: "Stefon Diggs",
-        college: "Maryland",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Maryland"
     },
     {
         name: "DeAndre Hopkins",
-        college: "Clemson",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx4fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Clemson"
     },
     {
         name: "DK Metcalf",
-        college: "Ole Miss",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Ole Miss"
     },
     {
         name: "Calvin Johnson",
-        college: "Georgia Tech",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Georgia Tech"
     },
     {
         name: "Larry Fitzgerald",
-        college: "Pittsburgh",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Pittsburgh"
     },
     {
         name: "Randy Moss",
-        college: "Marshall",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Marshall"
     },
     {
         name: "Jerry Rice",
-        college: "Mississippi Valley State",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx4fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Mississippi Valley State"
     },
     {
         name: "Julio Jones",
-        college: "Alabama",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Alabama"
     },
     {
         name: "A.J. Green",
-        college: "Georgia",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Georgia"
     },
     {
         name: "Odell Beckham Jr.",
-        college: "LSU",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "LSU"
     },
 
     // Elite Tight Ends
     {
         name: "Travis Kelce",
-        college: "Cincinnati",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Cincinnati"
     },
     {
         name: "Rob Gronkowski",
-        college: "Arizona",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx4fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Arizona"
     },
     {
         name: "George Kittle",
-        college: "Iowa",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Iowa"
     },
     {
         name: "Mark Andrews",
-        college: "Oklahoma",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Oklahoma"
     },
     {
         name: "Jason Witten",
-        college: "Tennessee",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Tennessee"
     },
     {
         name: "Antonio Gates",
-        college: "Kent State",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Kent State"
     },
 
     // Elite Defensive Players
     {
         name: "Aaron Donald",
-        college: "Pittsburgh",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Pittsburgh"
     },
     {
         name: "T.J. Watt",
-        college: "Wisconsin",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Wisconsin"
     },
     {
         name: "Myles Garrett",
-        college: "Texas A&M",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Texas A&M"
     },
     {
         name: "Khalil Mack",
-        college: "Buffalo",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Buffalo"
     },
     {
         name: "Von Miller",
-        college: "Texas A&M",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Texas A&M"
     },
     {
         name: "J.J. Watt",
-        college: "Wisconsin",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Wisconsin"
     },
     {
         name: "Luke Kuechly",
-        college: "Boston College",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Boston College"
     },
     {
         name: "Ray Lewis",
-        college: "Miami",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Miami"
     },
     {
         name: "Ed Reed",
-        college: "Miami",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Miami"
     },
     {
         name: "Troy Polamalu",
-        college: "USC",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "USC"
     },
     {
         name: "Darrelle Revis",
-        college: "Pittsburgh",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Pittsburgh"
     },
     {
         name: "Richard Sherman",
-        college: "Stanford",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Stanford"
     },
 
     // Notable Players from Different Colleges
     {
         name: "Baker Mayfield",
-        college: "Oklahoma",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Oklahoma"
     },
     {
         name: "Sam Darnold",
-        college: "USC",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "USC"
     },
     {
         name: "Josh Rosen",
-        college: "UCLA",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "UCLA"
     },
     {
         name: "Carson Wentz",
-        college: "North Dakota State",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "North Dakota State"
     },
     {
         name: "Cam Newton",
-        college: "Auburn",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Auburn"
     },
     {
         name: "Andrew Luck",
-        college: "Stanford",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Stanford"
     },
     {
         name: "Robert Griffin III",
-        college: "Baylor",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Baylor"
     },
     {
         name: "Marcus Mariota",
-        college: "Oregon",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Oregon"
     },
     {
         name: "Jameis Winston",
-        college: "Florida State",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Florida State"
     },
     {
         name: "Mitch Trubisky",
-        college: "North Carolina",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "North Carolina"
     },
 
     // More Running Backs
     {
         name: "Le'Veon Bell",
-        college: "Michigan State",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Michigan State"
     },
     {
         name: "Todd Gurley",
-        college: "Georgia",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Georgia"
     },
     {
         name: "Melvin Gordon",
-        college: "Wisconsin",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Wisconsin"
     },
     {
         name: "Leonard Fournette",
-        college: "LSU",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "LSU"
     },
     {
         name: "Joe Mixon",
-        college: "Oklahoma",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Oklahoma"
     },
     {
         name: "Dalvin Cook",
-        college: "Florida State",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Florida State"
     },
     {
         name: "Josh Jacobs",
-        college: "Alabama",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Alabama"
     },
     {
         name: "Jonathan Taylor",
-        college: "Wisconsin",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Wisconsin"
     },
 
     // More Wide Receivers
     {
         name: "Michael Thomas",
-        college: "Ohio State",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Ohio State"
     },
     {
         name: "Adam Thielen",
-        college: "Minnesota State",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Minnesota State"
     },
     {
         name: "Keenan Allen",
-        college: "California",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "California"
     },
     {
         name: "Mike Evans",
-        college: "Texas A&M",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Texas A&M"
     },
     {
         name: "Chris Godwin",
-        college: "Penn State",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Penn State"
     },
     {
         name: "Tyler Lockett",
-        college: "Kansas State",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Kansas State"
     },
     {
         name: "Allen Robinson",
-        college: "Penn State",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Penn State"
     },
     {
         name: "Amari Cooper",
-        college: "Alabama",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Alabama"
     },
     {
         name: "JuJu Smith-Schuster",
-        college: "USC",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "USC"
     },
 
     // Notable Smaller Schools
     {
         name: "Antonio Brown",
-        college: "Central Michigan",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Central Michigan"
     },
     {
         name: "Jimmy Garoppolo",
-        college: "Eastern Illinois",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Eastern Illinois"
     },
     {
         name: "Ben Roethlisberger",
-        college: "Miami (OH)",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Miami (OH)"
     },
     {
         name: "Carson Palmer",
-        college: "USC",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "USC"
     },
     {
         name: "Philip Rivers",
-        college: "NC State",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "NC State"
     },
     {
         name: "Matt Ryan",
-        college: "Boston College",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Boston College"
     },
     {
         name: "Matthew Stafford",
-        college: "Georgia",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Georgia"
     },
     {
         name: "Kirk Cousins",
-        college: "Michigan State",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Michigan State"
     },
     {
         name: "Ryan Tannehill",
-        college: "Texas A&M",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Texas A&M"
     },
     {
         name: "Derek Carr",
-        college: "Fresno State",
-        image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+        college: "Fresno State"
     }
 ];
 
@@ -503,8 +446,8 @@ async function loadPlayersFromCSV() {
             const values = line.split(',');
             const player = {
                 name: values[0],
-                college: values[1],
-                image: values[2]
+                college: values[1]
+                // Image will be generated dynamically
             };
             players.push(player);
         }
@@ -609,7 +552,8 @@ function loadNextPlayer() {
     
     // Update UI
     playerNameElement.textContent = currentPlayer.name;
-    playerImgElement.src = currentPlayer.image;
+    // Generate image dynamically if not provided
+    playerImgElement.src = currentPlayer.image || generatePlayerImageURL(currentPlayer.name);
     playerImgElement.alt = currentPlayer.name;
     
     updateGuessesLeft();
