@@ -183,6 +183,26 @@ header p {
     cursor: not-allowed;
 }
 
+#pass-button {
+    padding: 12px 20px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#pass-button:hover {
+    background: #5a6268;
+}
+
+#pass-button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
 .feedback-section {
     min-height: 80px;
     margin-bottom: 20px;

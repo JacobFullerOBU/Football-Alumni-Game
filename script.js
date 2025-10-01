@@ -484,6 +484,7 @@ const playerNameElement = document.getElementById('player-name');
 const guessInputElement = document.getElementById('guess-input');
 const collegeDropdownElement = document.getElementById('college-dropdown');
 const submitGuessButton = document.getElementById('submit-guess');
+const passButton = document.getElementById('pass-button');
 const feedbackElement = document.getElementById('feedback');
 const previousGuessesElement = document.getElementById('previous-guesses');
 const nextPlayerButton = document.getElementById('next-player');
@@ -614,6 +615,7 @@ function hideDropdown() {
 function enableGuessing() {
     guessInputElement.disabled = false;
     submitGuessButton.disabled = false;
+    passButton.disabled = false;
     guessInputElement.value = '';
     collegeDropdownElement.classList.add('hidden');
     guessInputElement.focus();
@@ -623,6 +625,7 @@ function enableGuessing() {
 function disableGuessing() {
     guessInputElement.disabled = true;
     submitGuessButton.disabled = true;
+    passButton.disabled = true;
     collegeDropdownElement.classList.add('hidden');
 }
 
@@ -758,6 +761,28 @@ function submitGuess() {
     updateGuessesLeft();
 }
 
+// Pass on current player
+function passPlayer() {
+    if (!gameActive || !currentPlayer) return;
+    
+    // Count as incorrect
+    incorrectAnswers++;
+    totalPlayers++;
+    
+    // Show feedback
+    feedbackElement.textContent = `Passed! ${currentPlayer.name} attended ${currentPlayer.college}.`;
+    feedbackElement.className = 'feedback incorrect';
+    
+    // Disable guessing and show controls
+    disableGuessing();
+    nextPlayerButton.classList.remove('hidden');
+    restartGameButton.classList.remove('hidden');
+    
+    // Update displays
+    updateScore();
+    updateRunningScore();
+}
+
 // End game
 function endGame() {
     gameActive = false;
@@ -768,6 +793,8 @@ function endGame() {
 
 // Event listeners
 submitGuessButton.addEventListener('click', submitGuess);
+
+passButton.addEventListener('click', passPlayer);
 
 guessInputElement.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
