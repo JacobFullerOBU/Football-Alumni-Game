@@ -432,7 +432,7 @@ let players = [
 // Function to load players from CSV file
 async function loadPlayersFromCSV() {
     try {
-        const response = await fetch('players.csv');
+        const response = await fetch('players_with_images.csv');
         const csvText = await response.text();
         
         // Parse CSV manually (simple parser for our format)
