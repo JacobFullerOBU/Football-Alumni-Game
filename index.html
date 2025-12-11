@@ -16,7 +16,27 @@
             <p>Guess which college these NFL players attended!</p>
         </header>
         
-        <div class="game-area">
+        <div id="mode-selection" class="mode-selection">
+            <h2 class="mode-title">Select Difficulty</h2>
+            <div class="mode-buttons">
+                <button class="mode-btn training" onclick="startGame('training')">
+                    <span class="mode-name">Training Camp</span>
+                    <span class="mode-desc">No timer, 3 guesses per player</span>
+                </button>
+                <button class="mode-btn season" onclick="startGame('season')">
+                    <span class="mode-name">Regular Season</span>
+                    <span class="mode-desc">15s per player, 3 lives total</span>
+                </button>
+                <button class="mode-btn suddenDeath" onclick="startGame('suddenDeath')">
+                    <span class="mode-name">Sudden Death</span>
+                    <span class="mode-desc">5s per player, 1 life</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="game-container" style="display:none;">
+            <div id="timer-display" class="timer-display"></div>
+            <div class="game-area">
             <div class="score-section">
                 <div class="score">Score: <span id="score">0</span></div>
                 <div class="guesses">Guesses left: <span id="guesses-left">3</span></div>

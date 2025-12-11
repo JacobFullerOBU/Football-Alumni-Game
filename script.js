@@ -442,12 +442,16 @@ async function loadPlayersFromCSV() {
         for (let i = 1; i < lines.length; i++) {
             const line = lines[i];
             if (!line.trim()) continue;
-            const values = line.split(',');
-            const player = {
-                name: values[0],
-                college: values[1],
-                image: values[2] && values[2].startsWith('http') ? values[2] : ''
-            };
+            // Use a regex to split only on commas not inside quotes
+            const values = line.match(/(?:"[^"]*"|[^,])+/g) || line.split(',');
+            // Remove quotes from values
+            const clean = values.map(v => v.replace(/^"|"$/g, ''));
+            // If more than 3 columns, join the rest as image_url (handles commas in college names)
+            let name = clean[0];
+            let college = clean[1];
+            let image = clean.slice(2).join(',').trim();
+            if (image && !image.startsWith('http')) image = '';
+            const player = { name, college, image };
             players.push(player);
         }
         
@@ -492,14 +496,34 @@ const gameOverElement = document.getElementById('game-over');
 const finalScoreElement = document.getElementById('final-score');
 const playAgainButton = document.getElementById('play-again');
 
-// Initialize game
+// Game Modes
+const gameModes = {
+    training: {
+        name: "Training Camp",
+        timeLimit: null,      // No timer
+        globalLives: false,   // Lives reset every new player
+        startingLives: 3      // 3 guesses per player
+    },
+    season: {
+        name: "Regular Season",
+        timeLimit: 15,        // 15 seconds per player
+        globalLives: true,    // Lives carry over (Total health)
+        startingLives: 3      // 3 lives TOTAL for the whole game
+    },
+    suddenDeath: {
+        name: "Sudden Death",
+        timeLimit: 5,         // 5 seconds per player
+        globalLives: true,    // Lives carry over
+        startingLives: 1      // 1 mistake and game over
+    }
+};
+let currentMode = gameModes.training;
+let currentLives = currentMode.startingLives;
+let timerInterval;
+
 async function initGame() {
-    // Load players from CSV file
     await loadPlayersFromCSV();
-    
-    // Update unique colleges list after loading CSV
     uniqueColleges = [...new Set(players.map(player => player.college))].sort();
-    
     score = 0;
     correctAnswers = 0;
     incorrectAnswers = 0;
@@ -507,10 +531,104 @@ async function initGame() {
     usedPlayers = [];
     gameActive = true;
     gameOverElement.classList.add('hidden');
-    document.querySelector('.game-area').classList.remove('hidden');
+    document.getElementById('mode-selection').style.display = '';
+    document.getElementById('game-container').style.display = 'none';
     updateScore();
     updateRunningScore();
-    loadNextPlayer();
+}
+
+function startGame(selectedModeKey) {
+    currentMode = gameModes[selectedModeKey];
+    currentLives = currentMode.startingLives;
+    document.getElementById('mode-selection').style.display = 'none';
+    document.getElementById('game-container').style.display = 'block';
+    score = 0;
+    correctAnswers = 0;
+    incorrectAnswers = 0;
+    totalPlayers = 0;
+    usedPlayers = [];
+    gameActive = true;
+    updateScore();
+    updateRunningScore();
+    loadNewPlayer();
+}
+
+function startTimer() {
+    if (currentMode.timeLimit === null) return;
+    let timeLeft = currentMode.timeLimit;
+    const timerDisplay = document.getElementById("timer-display");
+    timerDisplay.innerText = `Time: ${timeLeft}s`;
+    clearInterval(timerInterval);
+    timerDisplay.classList.remove('urgent');
+    timerDisplay.innerText = `${timeLeft}`;
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        timerDisplay.innerText = `${timeLeft}`;
+        if (timeLeft <= 5) {
+            timerDisplay.classList.add('urgent');
+        } else {
+            timerDisplay.classList.remove('urgent');
+        }
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            if (!guessInputElement.disabled) {
+                handleWrongAnswer();
+            }
+        }
+    }, 1000);
+}
+
+function updateScoreBoard() {
+    updateScore();
+    updateRunningScore();
+    // Update lives display if you want (add to HTML if needed)
+}
+
+function handleWrongAnswer() {
+    currentLives--;
+    updateScoreBoard();
+    if (currentLives <= 0) {
+        clearInterval(timerInterval);
+        triggerGameOver();
+    } else {
+        if (currentMode.globalLives) {
+            alert(`Wrong! It was ${currentPlayer.college}`);
+            loadNewPlayer();
+        }
+    }
+}
+
+function triggerGameOver() {
+    gameActive = false;
+    clearInterval(timerInterval);
+    finalScoreElement.textContent = score;
+    document.querySelector('.game-area').classList.add('hidden');
+    gameOverElement.classList.remove('hidden');
+    document.getElementById('timer-display').innerText = '';
+}
+
+function loadNewPlayer() {
+    if (usedPlayers.length >= players.length) {
+        triggerGameOver();
+        return;
+    }
+    guessesLeft = currentMode.globalLives ? currentLives : currentMode.startingLives;
+    previousGuesses = [];
+    let availablePlayers = players.filter((_, index) => !usedPlayers.includes(index));
+    let randomIndex = Math.floor(Math.random() * availablePlayers.length);
+    currentPlayer = availablePlayers[randomIndex];
+    let originalIndex = players.findIndex(p => p.name === currentPlayer.name);
+    usedPlayers.push(originalIndex);
+    playerNameElement.textContent = currentPlayer.name;
+    playerImgElement.src = currentPlayer.image || generatePlayerImageURL(currentPlayer.name);
+    playerImgElement.alt = currentPlayer.name;
+    updateGuessesLeft();
+    clearFeedback();
+    enableGuessing();
+    nextPlayerButton.classList.add('hidden');
+    restartGameButton.classList.add('hidden');
+    updateScoreBoard();
+    startTimer();
 }
 
 // Update score display
@@ -531,38 +649,9 @@ function updateGuessesLeft() {
 }
 
 // Load next player
+// Alias for compatibility
 function loadNextPlayer() {
-    if (usedPlayers.length >= players.length) {
-        endGame();
-        return;
-    }
-
-    // Reset for new player
-    guessesLeft = 3;
-    previousGuesses = [];
-    
-    // Get random unused player
-    let availablePlayers = players.filter((_, index) => !usedPlayers.includes(index));
-    let randomIndex = Math.floor(Math.random() * availablePlayers.length);
-    currentPlayer = availablePlayers[randomIndex];
-    
-    // Mark player as used
-    let originalIndex = players.findIndex(p => p.name === currentPlayer.name);
-    usedPlayers.push(originalIndex);
-    
-    // Update UI
-    playerNameElement.textContent = currentPlayer.name;
-    // Generate image dynamically if not provided
-    playerImgElement.src = currentPlayer.image || generatePlayerImageURL(currentPlayer.name);
-    playerImgElement.alt = currentPlayer.name;
-    
-    updateGuessesLeft();
-    clearFeedback();
-    enableGuessing();
-    
-    // Hide control buttons
-    nextPlayerButton.classList.add('hidden');
-    restartGameButton.classList.add('hidden');
+    loadNewPlayer();
 }
 
 // Clear feedback section
@@ -718,7 +807,7 @@ function isCorrectGuess(guess, college) {
 // Submit guess
 function submitGuess() {
     if (!gameActive || !currentPlayer) return;
-    
+    clearInterval(timerInterval); // Stop timer on guess
     const guess = guessInputElement.value.trim();
     if (!guess) return;
     
@@ -732,10 +821,15 @@ function submitGuess() {
         totalPlayers++;
         feedbackElement.textContent = `Correct! ${currentPlayer.name} attended ${currentPlayer.college}.`;
         feedbackElement.className = 'feedback correct';
-        
         disableGuessing();
         nextPlayerButton.classList.remove('hidden');
         restartGameButton.classList.remove('hidden');
+        // Auto-advance in global lives mode
+        if (currentMode.globalLives) {
+            setTimeout(() => {
+                loadNewPlayer();
+            }, 1200); // 1.2s delay for feedback
+        }
     } else {
         // Incorrect guess
         if (guessesLeft > 0) {
@@ -763,31 +857,26 @@ function submitGuess() {
 // Pass on current player
 function passPlayer() {
     if (!gameActive || !currentPlayer) return;
-    
+    clearInterval(timerInterval); // Stop timer on pass
     // Count as incorrect
     incorrectAnswers++;
     totalPlayers++;
-    
     // Show feedback
     feedbackElement.textContent = `Passed! ${currentPlayer.name} attended ${currentPlayer.college}.`;
     feedbackElement.className = 'feedback incorrect';
-    
     // Disable guessing and show controls
     disableGuessing();
     nextPlayerButton.classList.remove('hidden');
     restartGameButton.classList.remove('hidden');
-    
     // Update displays
     updateScore();
     updateRunningScore();
 }
 
 // End game
+// Alias for compatibility
 function endGame() {
-    gameActive = false;
-    finalScoreElement.textContent = score;
-    document.querySelector('.game-area').classList.add('hidden');
-    gameOverElement.classList.remove('hidden');
+    triggerGameOver();
 }
 
 
