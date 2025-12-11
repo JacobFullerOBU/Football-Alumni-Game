@@ -31,35 +31,47 @@ def get_wikipedia_image(player_name):
 
 def main():
     import time
-    with open("players.csv", newline='', encoding='utf-8') as infile, \
-         open("players_with_images.csv", 'w', newline='', encoding='utf-8') as outfile:
+    with open("players_with_images.csv", newline='', encoding='utf-8') as infile, \
+         open("players_with_images_checked.csv", 'w', newline='', encoding='utf-8') as outfile:
         reader = csv.DictReader(infile)
         print(f"Fieldnames detected: {reader.fieldnames}")
-        fieldnames = reader.fieldnames + ["image_url"]
+        fieldnames = reader.fieldnames
         writer = csv.DictWriter(outfile, fieldnames=fieldnames)
         writer.writeheader()
         row_count = 0
+        no_image_players = []
         for i, row in enumerate(reader, 1):
             print(f"Row {i}: {row}")
             row_count += 1
             player_name = row[reader.fieldnames[0]]  # Assumes first column is name
-            print(f"[{i}] Processing: {player_name}")
-            image_url = get_wikipedia_image(player_name)
-            if image_url:
-                print(f"    Found image: {image_url}")
+            image_url = row.get("image_url", "")
+            if not image_url:
+                print(f"[{i}] Processing: {player_name} (no image, trying to fetch)")
+                image_url = get_wikipedia_image(player_name)
+                if image_url:
+                    print(f"    Found image: {image_url}")
+                else:
+                    print(f"    No image found.")
+                    no_image_players.append(player_name)
+                row["image_url"] = image_url
             else:
-                print(f"    No image found.")
-            row["image_url"] = image_url
+                print(f"[{i}] {player_name} already has image.")
             writer.writerow(row)
             time.sleep(1)  # polite delay to avoid rate limits
         print(f"Total rows processed: {row_count}")
-    print("Done. Check players_with_images.csv for results.")
+        if no_image_players:
+            print("\nPlayers with no image found:")
+            for name in no_image_players:
+                print(f" - {name}")
+        else:
+            print("All players have images.")
+    print("Done. Check players_with_images_checked.csv for results.")
 
 if __name__ == "__main__":
     import os
     print("Script started.")
-    if not os.path.exists("players.csv"):
-        print("players.csv not found!")
+    if not os.path.exists("players_with_images.csv"):
+        print("players_with_images.csv not found!")
     else:
-        print("players.csv found, running main().")
+        print("players_with_images.csv found, running main().")
         main()

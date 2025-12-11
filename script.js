@@ -442,12 +442,11 @@ async function loadPlayersFromCSV() {
         for (let i = 1; i < lines.length; i++) {
             const line = lines[i];
             if (!line.trim()) continue;
-            
             const values = line.split(',');
             const player = {
                 name: values[0],
-                college: values[1]
-                // Image will be generated dynamically
+                college: values[1],
+                image: values[2] && values[2].startsWith('http') ? values[2] : ''
             };
             players.push(player);
         }
