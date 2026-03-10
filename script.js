@@ -618,6 +618,11 @@ restartGameButton.addEventListener('click', function() {
         initGame();
     }
 });
+document.getElementById('end-game-btn').addEventListener('click', function() {
+    if (confirm('End the game and submit your score to the leaderboard?')) {
+        triggerGameOver();
+    }
+});
 playAgainButton.addEventListener('click', initGame);
 
 // Save score to leaderboard

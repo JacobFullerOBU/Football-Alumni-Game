@@ -409,6 +409,15 @@ header p {
     background: #e0a800;
 }
 
+#end-game-btn {
+    background: #dc3545;
+    color: white;
+}
+
+#end-game-btn:hover {
+    background: #a71d2a;
+}
+
 .game-over {
     background: linear-gradient(135deg, #e8eaf6 60%, #fff 100%);
     border-radius: 20px;
