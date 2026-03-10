@@ -51,7 +51,7 @@ function applyFilters() {
 
 // Update uniqueColleges for dropdown
 let uniqueColleges = [];
-// --- Ensure mode buttons are enabled only after CSV is loaded ---
+// --- Ensure mode buttons are enabled after CSV loads ---
 async function initGame() {
     await loadPlayersFromCSV();
     uniqueColleges = [...new Set(csvPlayers.map(player => player.college))].sort();
@@ -66,8 +66,10 @@ async function initGame() {
     document.getElementById('game-container').style.display = 'none';
     updateScore();
     updateRunningScore();
-    // Enable mode buttons
-    document.querySelectorAll('.mode-btn').forEach(btn => btn.disabled = false);
+    // Enable mode buttons (guaranteed)
+    setTimeout(() => {
+        document.querySelectorAll('.mode-btn').forEach(btn => btn.disabled = false);
+    }, 100);
 }
 
 // Disable mode buttons until CSV is loaded
