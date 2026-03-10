@@ -1,87 +1,3 @@
-// Global variable to hold CSV player data
-let csvPlayers = [];
-
-// CSV loader function using Papa.parse
-async function loadPlayersFromCSV() {
-    return new Promise((resolve, reject) => {
-        Papa.parse('players_with_images.csv', {
-            download: true,
-            header: true,
-            complete: function(results) {
-                csvPlayers = results.data;
-                resolve();
-            },
-            error: function(err) {
-                reject(err);
-            }
-        });
-    });
-}
-
-// --- Restructure: All DOM-dependent code inside DOMContentLoaded ---
-document.addEventListener('DOMContentLoaded', () => {
-    // DOM elements
-    const scoreElement = document.getElementById('score');
-    const correctCountElement = document.getElementById('correct-count');
-    const incorrectCountElement = document.getElementById('incorrect-count');
-    const totalCountElement = document.getElementById('total-count');
-    const guessesLeftElement = document.getElementById('guesses-left');
-    const playerImgElement = document.getElementById('player-img');
-    const playerNameElement = document.getElementById('player-name');
-    const guessInputElement = document.getElementById('guess-input');
-    const collegeDropdownElement = document.getElementById('college-dropdown');
-    const submitGuessButton = document.getElementById('submit-guess');
-    const passButton = document.getElementById('pass-button');
-    const feedbackElement = document.getElementById('feedback');
-    const previousGuessesElement = document.getElementById('previous-guesses');
-    const nextPlayerButton = document.getElementById('next-player');
-    const restartGameButton = document.getElementById('restart-game');
-    const gameOverElement = document.getElementById('game-over');
-    const finalScoreElement = document.getElementById('final-score');
-    const playAgainButton = document.getElementById('play-again');
-
-    // Add event listeners for submit and pass buttons
-    submitGuessButton.addEventListener('click', submitGuess);
-    passButton.addEventListener('click', passPlayer);
-
-    // Enter key support for guess input
-    guessInputElement.addEventListener("keypress", function(event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            submitGuessButton.click();
-        }
-    });
-
-    // Dropdown functionality for college search
-    guessInputElement.addEventListener('input', function(e) {
-        const filter = e.target.value;
-        if (filter.length > 0) {
-            populateCollegeDropdown(filter);
-        } else {
-            collegeDropdownElement.classList.add('hidden');
-        }
-    });
-
-    guessInputElement.addEventListener('focus', function(e) {
-        if (e.target.value.length > 0) {
-            populateCollegeDropdown(e.target.value);
-        }
-    });
-
-    guessInputElement.addEventListener('blur', hideDropdown);
-    nextPlayerButton.addEventListener('click', loadNextPlayer);
-    restartGameButton.addEventListener('click', function() {
-        if (confirm('Are you sure you want to restart the game? Your current progress will be lost.')) {
-            initGame();
-        }
-    });
-    playAgainButton.addEventListener('click', initGame);
-    playerImgElement.addEventListener('error', function() {
-        this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTAwIDEwMEM4MS4wNDI5IDEwMCA2NiA4NC45NTcxIDY2IDY2QzY2IDQ3LjA0MjkgODEuMDQyOSAzMiAxMDAgMzJDMTE4Ljk1NyAzMiAxMzQgNDcuMDQyOSAxMzQgNjZDMTM0IDg0Ljk1NzEgMTE4Ljk1NyAxMDAgMTAwIDEwMFpNMTAwIDEzNEM4MS4wNDI5IDEzNCA2NiAxNDkuMDQzIDY2IDE2OEg0NkM0NiAxMzguMDcyIDcwLjA3MjEgMTE0IDEwMCAxMTRDMTI5LjkyOCAxMTQgMTU0IDEzOC4wNzIgMTU0IDE2OEgxMzRDMTM0IDE0OS4wNDMgMTE4Ljk1NyAxMzQgMTAwIDEzNFoiIGZpbGw9IiM5Q0E0QUYiLz4KPC9zdmc+';
-    });
-    // ...existing code...
-});
-
 // Helper function to generate player image URL
 function generatePlayerImageURL(playerName) {
     // Generate player initials
@@ -117,29 +33,118 @@ function generatePlayerImageURL(playerName) {
     // Return as data URL
     return 'data:image/svg+xml;base64,' + btoa(svg);
 }
-
 // --- FILTER LOGIC ---
 let filteredPlayers = [];
 
 function applyFilters() {
     const timePeriod = document.getElementById('time-period-filter').value;
     const difficulty = document.getElementById('difficulty-filter').value;
-    filteredPlayers = csvPlayers.filter(player => {
-        // Treat missing values as 'all'
-        let playerTime = player.time_period ? player.time_period : 'all';
-        let playerDifficulty = player.difficulty ? player.difficulty : 'all';
-        let matchTime = (timePeriod === 'all' || playerTime === timePeriod || playerTime === 'all');
-        let matchDifficulty = (difficulty === 'all' || playerDifficulty === difficulty || playerDifficulty === 'all');
+    filteredPlayers = players.filter(player => {
+        let matchTime = (timePeriod === 'all' || (player.time_period && player.time_period === timePeriod));
+        let matchDifficulty = (difficulty === 'all' || (player.difficulty && player.difficulty === difficulty));
         return matchTime && matchDifficulty;
     });
 }
 
-// Update uniqueColleges for dropdown
-let uniqueColleges = [];
-// --- Ensure mode buttons are enabled after CSV loads ---
+// Update loadPlayersFromCSV to parse new columns
+document.addEventListener('DOMContentLoaded', () => {
+    const timePeriodFilter = document.getElementById('time-period-filter');
+    const difficultyFilter = document.getElementById('difficulty-filter');
+    if (timePeriodFilter && difficultyFilter) {
+        timePeriodFilter.addEventListener('change', applyFilters);
+        difficultyFilter.addEventListener('change', applyFilters);
+    }
+});
+
+async function loadPlayersFromCSV() {
+    try {
+        const response = await fetch('players_with_images.csv');
+        const csvText = await response.text();
+        const lines = csvText.trim().split('\n');
+        const headers = lines[0].split(',');
+        for (let i = 1; i < lines.length; i++) {
+            const line = lines[i];
+            if (!line.trim()) continue;
+            const values = line.match(/(?:"[^"]*"|[^,])+/g) || line.split(',');
+            const clean = values.map(v => v.replace(/^"|"$/g, ''));
+            let name = clean[0];
+            let college = clean[1];
+            let image = clean[2] || '';
+            let time_period = clean[3] || '';
+            let difficulty = clean[4] || '';
+            if (image && !image.startsWith('http')) image = '';
+            const player = { name, college, image, time_period, difficulty };
+            players.push(player);
+        }
+        applyFilters();
+        console.log(`Loaded ${lines.length - 1} players from CSV`);
+    } catch (error) {
+        console.error('Error loading CSV:', error);
+    }
+}
+
+// Game state
+let currentPlayer = null;
+let score = 0;
+let correctAnswers = 0;
+let incorrectAnswers = 0;
+let totalPlayers = 0;
+let guessesLeft = 3;
+let previousGuesses = [];
+let gameActive = true;
+let usedPlayers = [];
+
+// Extract unique colleges for dropdown (will be updated after CSV loads)
+let uniqueColleges = [...new Set(players.map(player => player.college))].sort();
+
+// DOM elements
+const scoreElement = document.getElementById('score');
+const correctCountElement = document.getElementById('correct-count');
+const incorrectCountElement = document.getElementById('incorrect-count');
+const totalCountElement = document.getElementById('total-count');
+const guessesLeftElement = document.getElementById('guesses-left');
+const playerImgElement = document.getElementById('player-img');
+const playerNameElement = document.getElementById('player-name');
+const guessInputElement = document.getElementById('guess-input');
+const collegeDropdownElement = document.getElementById('college-dropdown');
+const submitGuessButton = document.getElementById('submit-guess');
+const passButton = document.getElementById('pass-button');
+const feedbackElement = document.getElementById('feedback');
+const previousGuessesElement = document.getElementById('previous-guesses');
+const nextPlayerButton = document.getElementById('next-player');
+const restartGameButton = document.getElementById('restart-game');
+const gameOverElement = document.getElementById('game-over');
+const finalScoreElement = document.getElementById('final-score');
+const playAgainButton = document.getElementById('play-again');
+
+// Game Modes
+const gameModes = {
+    training: {
+        name: "Training Camp",
+        timeLimit: null,      // No timer
+        globalLives: false,   // Lives reset every new player
+        startingLives: 3      // 3 guesses per player
+    },
+    season: {
+        name: "Regular Season",
+        timeLimit: 15,        // 15 seconds per player
+        globalLives: true,    // Lives carry over (Total health)
+        startingLives: 3      // 3 lives TOTAL for the whole game
+    },
+    suddenDeath: {
+        name: "Sudden Death",
+        timeLimit: 5,         // 5 seconds per player
+        globalLives: true,    // Lives carry over
+        startingLives: 1      // 1 mistake and game over
+    }
+};
+let currentMode = gameModes.training;
+let currentLives = currentMode.startingLives;
+let timerInterval;
+
 async function initGame() {
     await loadPlayersFromCSV();
-    uniqueColleges = [...new Set(csvPlayers.map(player => player.college))].sort();
+    uniqueColleges = [...new Set(players.map(player => player.college))].sort();
     score = 0;
     correctAnswers = 0;
     incorrectAnswers = 0;
@@ -151,19 +156,10 @@ async function initGame() {
     document.getElementById('game-container').style.display = 'none';
     updateScore();
     updateRunningScore();
-    // Enable mode buttons (guaranteed)
-    setTimeout(() => {
-        document.querySelectorAll('.mode-btn').forEach(btn => btn.disabled = false);
-    }, 100);
 }
 
-// Disable mode buttons until CSV is loaded
-window.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.mode-btn').forEach(btn => btn.disabled = true);
-});
-
 function startGame(selectedModeKey) {
-    console.log('startGame called with mode:', selectedModeKey);
+    // Apply filters before starting
     applyFilters();
     if (!filteredPlayers || filteredPlayers.length === 0) {
         alert('No players match your selected filters. Please try a different combination.');
@@ -511,5 +507,47 @@ function endGame() {
 }
 
 
+// Event listeners
+submitGuessButton.addEventListener('click', submitGuess);
+passButton.addEventListener('click', passPlayer);
+
+// Provided code: Add Enter key support for guess input
+const inputField = document.querySelector('input[type="text"]');
+const submitBtn = document.getElementById('submit-guess');
+inputField.addEventListener("keypress", function(event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    submitBtn.click();
+  }
+});
+
+// Dropdown functionality for college search
+guessInputElement.addEventListener('input', function(e) {
+    const filter = e.target.value;
+    if (filter.length > 0) {
+        populateCollegeDropdown(filter);
+    } else {
+        collegeDropdownElement.classList.add('hidden');
+    }
+});
+
+guessInputElement.addEventListener('focus', function(e) {
+    if (e.target.value.length > 0) {
+        populateCollegeDropdown(e.target.value);
+    }
+});
+
+guessInputElement.addEventListener('blur', hideDropdown);
+nextPlayerButton.addEventListener('click', loadNextPlayer);
+restartGameButton.addEventListener('click', function() {
+    if (confirm('Are you sure you want to restart the game? Your current progress will be lost.')) {
+        initGame();
+    }
+});
+playAgainButton.addEventListener('click', initGame);
+// Handle image loading errors
+playerImgElement.addEventListener('error', function() {
+    this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTAwIDEwMEM4MS4wNDI5IDEwMCA2NiA4NC45NTcxIDY2IDY2QzY2IDQ3LjA0MjkgODEuMDQyOSAzMiAxMDAgMzJDMTE4Ljk1NyAzMiAxMzQgNDcuMDQyOSAxMzQgNjZDMTM0IDg0Ljk1NzEgMTE4Ljk1NyAxMDAgMTAwIDEwMFpNMTAwIDEzNEM4MS4wNDI5IDEzNCA2NiAxNDkuMDQzIDY2IDE2OEg0NkM0NiAxMzguMDcyIDcwLjA3MjEgMTE0IDEwMCAxMTRDMTI5LjkyOCAxMTQgMTU0IDEzOC4wNzIgMTU0IDE2OEgxMzRDMTM0IDE0OS4wNDMgMTE4Ljk1NyAxMzQgMTAwIDEzNFoiIGZpbGw9IiM5Q0E0QUYiLz4KPC9zdmc+';
+});
 // Initialize the game when page loads
 document.addEventListener('DOMContentLoaded', initGame);
