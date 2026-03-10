@@ -78,6 +78,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function startGame(selectedModeKey) {
+    console.log('startGame called with mode:', selectedModeKey);
     applyFilters();
     if (!filteredPlayers || filteredPlayers.length === 0) {
         alert('No players match your selected filters. Please try a different combination.');
