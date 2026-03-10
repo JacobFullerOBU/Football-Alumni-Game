@@ -555,6 +555,12 @@ async function initGame() {
 }
 
 function startGame(selectedModeKey) {
+    // Apply filters before starting
+    applyFilters();
+    if (!filteredPlayers || filteredPlayers.length === 0) {
+        alert('No players match your selected filters. Please try a different combination.');
+        return;
+    }
     currentMode = gameModes[selectedModeKey];
     currentLives = currentMode.startingLives;
     document.getElementById('mode-selection').style.display = 'none';
