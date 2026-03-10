@@ -20,8 +20,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const finalScoreElement = document.getElementById('final-score');
     const playAgainButton = document.getElementById('play-again');
 
-    // All game logic, event listeners, and variable assignments go here
-    // Move all functions and game state inside this block
+    // Add event listeners for submit and pass buttons
+    submitGuessButton.addEventListener('click', submitGuess);
+    passButton.addEventListener('click', passPlayer);
+
+    // Enter key support for guess input
+    guessInputElement.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            submitGuessButton.click();
+        }
+    });
+
+    // Dropdown functionality for college search
+    guessInputElement.addEventListener('input', function(e) {
+        const filter = e.target.value;
+        if (filter.length > 0) {
+            populateCollegeDropdown(filter);
+        } else {
+            collegeDropdownElement.classList.add('hidden');
+        }
+    });
+
+    guessInputElement.addEventListener('focus', function(e) {
+        if (e.target.value.length > 0) {
+            populateCollegeDropdown(e.target.value);
+        }
+    });
+
+    guessInputElement.addEventListener('blur', hideDropdown);
+    nextPlayerButton.addEventListener('click', loadNextPlayer);
+    restartGameButton.addEventListener('click', function() {
+        if (confirm('Are you sure you want to restart the game? Your current progress will be lost.')) {
+            initGame();
+        }
+    });
+    playAgainButton.addEventListener('click', initGame);
+    playerImgElement.addEventListener('error', function() {
+        this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTAwIDEwMEM4MS4wNDI5IDEwMCA2NiA4NC45NTcxIDY2IDY2QzY2IDQ3LjA0MjkgODEuMDQyOSAzMiAxMDAgMzJDMTE4Ljk1NyAzMiAxMzQgNDcuMDQyOSAxMzQgNjZDMTM0IDg0Ljk1NzEgMTE4Ljk1NyAxMDAgMTAwIDEwMFpNMTAwIDEzNEM4MS4wNDI5IDEzNCA2NiAxNDkuMDQzIDY2IDE2OEg0NkM0NiAxMzguMDcyIDcwLjA3MjEgMTE0IDEwMCAxMTRDMTI5LjkyOCAxMTQgMTU0IDEzOC4wNzIgMTU0IDE2OEgxMzRDMTM0IDE0OS4wNDMgMTE4Ljk1NyAxMzQgMTAwIDEzNFoiIGZpbGw9IiM5Q0E0QUYiLz4KPC9zdmc+';
+    });
     // ...existing code...
 });
 
@@ -454,45 +491,5 @@ function endGame() {
 }
 
 
-// Add event listeners for submit and pass buttons
-submitGuessButton.addEventListener('click', submitGuess);
-passButton.addEventListener('click', passPlayer);
-
-// Enter key support for guess input
-guessInputElement.addEventListener("keypress", function(event) {
-    if (event.key === "Enter") {
-        event.preventDefault();
-        submitGuessButton.click();
-    }
-});
-
-// Dropdown functionality for college search
-guessInputElement.addEventListener('input', function(e) {
-    const filter = e.target.value;
-    if (filter.length > 0) {
-        populateCollegeDropdown(filter);
-    } else {
-        collegeDropdownElement.classList.add('hidden');
-    }
-});
-
-guessInputElement.addEventListener('focus', function(e) {
-    if (e.target.value.length > 0) {
-        populateCollegeDropdown(e.target.value);
-    }
-});
-
-guessInputElement.addEventListener('blur', hideDropdown);
-nextPlayerButton.addEventListener('click', loadNextPlayer);
-restartGameButton.addEventListener('click', function() {
-    if (confirm('Are you sure you want to restart the game? Your current progress will be lost.')) {
-        initGame();
-    }
-});
-playAgainButton.addEventListener('click', initGame);
-// Handle image loading errors
-playerImgElement.addEventListener('error', function() {
-    this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTAwIDEwMEM4MS4wNDI5IDEwMCA2NiA4NC45NTcxIDY2IDY2QzY2IDQ3LjA0MjkgODEuMDQyOSAzMiAxMDAgMzJDMTE4Ljk1NyAzMiAxMzQgNDcuMDQyOSAxMzQgNjZDMTM0IDg0Ljk1NzEgMTE4Ljk1NyAxMDAgMTAwIDEwMFpNMTAwIDEzNEM4MS4wNDI5IDEzNCA2NiAxNDkuMDQzIDY2IDE2OEg0NkM0NiAxMzguMDcyIDcwLjA3MjEgMTE0IDEwMCAxMTRDMTI5LjkyOCAxMTQgMTU0IDEzOC4wNzIgMTU0IDE2OEgxMzRDMTM0IDE0OS4wNDMgMTE4Ljk1NyAxMzQgMTAwIDEzNFoiIGZpbGw9IiM5Q0E0QUYiLz4KPC9zdmc+';
-});
 // Initialize the game when page loads
 document.addEventListener('DOMContentLoaded', initGame);
