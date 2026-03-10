@@ -277,6 +277,12 @@ header p {
     background-color: #f8f9fa;
 }
 
+.dropdown-option-active {
+    background-color: #dce8ff;
+    color: #2a5298;
+    font-weight: 600;
+}
+
 .dropdown-option:last-child {
     border-bottom: none;
 }

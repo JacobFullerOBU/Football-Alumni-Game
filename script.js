@@ -326,8 +326,12 @@ function clearFeedback() {
     previousGuessesElement.textContent = '';
 }
 
+// Track arrow-key-highlighted dropdown item
+let dropdownHighlightIndex = -1;
+
 // Populate college dropdown
 function populateCollegeDropdown(filter = '') {
+    dropdownHighlightIndex = -1;
     collegeDropdownElement.innerHTML = '';
     
     const filteredColleges = uniqueColleges.filter(college => 
@@ -553,17 +557,43 @@ passButton.addEventListener('click', passPlayer);
 const inputField = document.querySelector('input[type="text"]');
 const submitBtn = document.getElementById('submit-guess');
 inputField.addEventListener("keydown", function(event) {
-  if (event.key === "Enter") {
+  const options = collegeDropdownElement.querySelectorAll('.dropdown-option');
+  const isOpen = !collegeDropdownElement.classList.contains('hidden') && options.length > 0;
+
+  if (event.key === "ArrowDown") {
+    if (!isOpen) return;
     event.preventDefault();
-    submitBtn.click();
+    dropdownHighlightIndex = (dropdownHighlightIndex + 1) % options.length;
+    updateDropdownHighlight(options);
+  } else if (event.key === "ArrowUp") {
+    if (!isOpen) return;
+    event.preventDefault();
+    dropdownHighlightIndex = (dropdownHighlightIndex - 1 + options.length) % options.length;
+    updateDropdownHighlight(options);
+  } else if (event.key === "Enter") {
+    event.preventDefault();
+    if (isOpen && dropdownHighlightIndex >= 0) {
+      selectCollege(options[dropdownHighlightIndex].textContent);
+    } else {
+      submitBtn.click();
+    }
   } else if (event.key === "Tab") {
-    const firstOption = collegeDropdownElement.querySelector('.dropdown-option');
-    if (firstOption && !collegeDropdownElement.classList.contains('hidden')) {
+    if (isOpen) {
       event.preventDefault();
-      selectCollege(firstOption.textContent);
+      const target = dropdownHighlightIndex >= 0 ? options[dropdownHighlightIndex] : options[0];
+      selectCollege(target.textContent);
     }
   }
 });
+
+function updateDropdownHighlight(options) {
+  options.forEach((opt, i) => {
+    opt.classList.toggle('dropdown-option-active', i === dropdownHighlightIndex);
+  });
+  if (dropdownHighlightIndex >= 0) {
+    options[dropdownHighlightIndex].scrollIntoView({ block: 'nearest' });
+  }
+}
 
 // Dropdown functionality for college search
 guessInputElement.addEventListener('input', function(e) {
