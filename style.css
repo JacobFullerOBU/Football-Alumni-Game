@@ -437,3 +437,7 @@ header p {
         margin-bottom: 10px;
     }
 }
+select{
+    color: white;
+    background: #232946;
+}
