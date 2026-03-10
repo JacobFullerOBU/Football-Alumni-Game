@@ -45,6 +45,20 @@ function applyFilters() {
         let matchDifficulty = (difficulty === 'all' || (player.difficulty && player.difficulty === difficulty));
         return matchTime && matchDifficulty;
     });
+    const countEl = document.getElementById('player-count-display');
+    if (countEl && players.length > 0) {
+        const n = filteredPlayers.length;
+        if (n === 0) {
+            countEl.textContent = 'No players match these filters.';
+            countEl.className = 'player-count-display player-count-none';
+        } else if (n < 8) {
+            countEl.textContent = `⚠️ Only ${n} player${n !== 1 ? 's' : ''} match these filters — round will be short.`;
+            countEl.className = 'player-count-display player-count-low';
+        } else {
+            countEl.textContent = `${n} players available`;
+            countEl.className = 'player-count-display player-count-ok';
+        }
+    }
 }
 
 // Update loadPlayersFromCSV to parse new columns
@@ -203,6 +217,10 @@ function startGame(selectedModeKey) {
         alert('No players match your selected filters. Please try a different combination.');
         return;
     }
+    if (filteredPlayers.length < 8) {
+        const proceed = confirm(`Only ${filteredPlayers.length} player(s) match these filters. Players will repeat once all have been shown. Continue?`);
+        if (!proceed) return;
+    }
     currentModeKey = selectedModeKey;
     currentMode = gameModes[selectedModeKey];
     currentLives = currentMode.startingLives;
@@ -268,6 +286,24 @@ function handleWrongAnswer() {
     }
 }
 
+function restartSameMode() {
+    score = 0;
+    correctAnswers = 0;
+    incorrectAnswers = 0;
+    totalPlayers = 0;
+    usedPlayers = [];
+    gameActive = true;
+    currentLives = currentMode.startingLives;
+    clearInterval(timerInterval);
+    document.getElementById('timer-display').innerText = '';
+    gameOverElement.classList.add('hidden');
+    document.querySelector('.game-area').classList.remove('hidden');
+    document.getElementById('game-container').style.display = 'block';
+    updateScore();
+    updateRunningScore();
+    loadNewPlayer();
+}
+
 function triggerGameOver() {
     gameActive = false;
     clearInterval(timerInterval);
@@ -314,8 +350,8 @@ function renderLeaderboard(modeKey) {
 
 function loadNewPlayer() {
     if (usedPlayers.length >= filteredPlayers.length) {
-        triggerGameOver();
-        return;
+        // Loop: reset used players so the round continues with the same pool
+        usedPlayers = [];
     }
     guessesLeft = currentMode.globalLives ? currentLives : currentMode.startingLives;
     previousGuesses = [];
@@ -679,6 +715,7 @@ document.getElementById('end-game-btn').addEventListener('click', function() {
     }
 });
 playAgainButton.addEventListener('click', initGame);
+document.getElementById('play-again-same').addEventListener('click', restartSameMode);
 
 // Save score to leaderboard
 document.getElementById('save-score-btn').addEventListener('click', function() {

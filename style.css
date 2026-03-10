@@ -701,6 +701,27 @@ header p:first-of-type {
     transform: translateY(-1px);
 }
 
+#play-again-same {
+    padding: 12px 24px;
+    background: #FFB800;
+    color: #080d14;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s;
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+#play-again-same:hover {
+    background: #ffc929;
+    transform: translateY(-1px);
+}
+
 #play-again {
     padding: 12px 24px;
     background: transparent;
@@ -721,6 +742,20 @@ header p:first-of-type {
     border-color: #3a5570;
     color: #c0cdd8;
 }
+
+/* Player count under filters */
+.player-count-display {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 6px 0 2px;
+}
+
+.player-count-ok   { color: #00C868; }
+.player-count-low  { color: #FFB800; }
+.player-count-none { color: #E63946; }
 
 /* =============================================
    LEADERBOARD

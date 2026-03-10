@@ -43,6 +43,7 @@
                     <option value="medium">Medium</option>
                     <option value="hard">Hard</option>
                 </select>
+                <div id="player-count-display" class="player-count-display" style="grid-column: 1 / -1;"></div>
             </div>
             <div class="mode-buttons">
                 <button class="mode-btn training" onclick="startGame('training')">
@@ -113,7 +114,8 @@
                 <input type="text" id="player-name-input" placeholder="Your name..." maxlength="20" autocomplete="off">
                 <button id="save-score-btn">Save Score</button>
             </div>
-            <button id="play-again">Play Again</button>
+            <button id="play-again-same">&#x21BA; Play Again (Same Mode)</button>
+            <button id="play-again">&#x2630; Change Mode</button>
         </div>
 
         <!-- Leaderboard -->
