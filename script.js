@@ -1,3 +1,23 @@
+// Global variable to hold CSV player data
+let csvPlayers = [];
+
+// CSV loader function using Papa.parse
+async function loadPlayersFromCSV() {
+    return new Promise((resolve, reject) => {
+        Papa.parse('players_with_images.csv', {
+            download: true,
+            header: true,
+            complete: function(results) {
+                csvPlayers = results.data;
+                resolve();
+            },
+            error: function(err) {
+                reject(err);
+            }
+        });
+    });
+}
+
 // --- Restructure: All DOM-dependent code inside DOMContentLoaded ---
 document.addEventListener('DOMContentLoaded', () => {
     // DOM elements
