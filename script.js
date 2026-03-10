@@ -454,18 +454,16 @@ function endGame() {
 }
 
 
-// Event listeners
-//submitGuessButton.addEventListener('click', submitGuess);
-//passButton.addEventListener('click', passPlayer);
+// Add event listeners for submit and pass buttons
+submitGuessButton.addEventListener('click', submitGuess);
+passButton.addEventListener('click', passPlayer);
 
-// Provided code: Add Enter key support for guess input
-const inputField = document.querySelector('input[type="text"]');
-const submitBtn = document.getElementById('submit-guess');
-inputField.addEventListener("keypress", function(event) {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    submitBtn.click();
-  }
+// Enter key support for guess input
+guessInputElement.addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        submitGuessButton.click();
+    }
 });
 
 // Dropdown functionality for college search
