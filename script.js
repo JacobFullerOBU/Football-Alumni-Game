@@ -287,6 +287,11 @@ function loadNewPlayer() {
     playerNameElement.textContent = currentPlayer.name;
     playerImgElement.src = currentPlayer.image || generatePlayerImageURL(currentPlayer.name);
     playerImgElement.alt = currentPlayer.name;
+    const badge = document.getElementById('difficulty-badge');
+    const diff = (currentPlayer.difficulty || '').toLowerCase();
+    badge.textContent = diff ? diff.charAt(0).toUpperCase() + diff.slice(1) : '';
+    badge.className = 'difficulty-badge' + (diff ? ' difficulty-' + diff : '');
+    badge.style.display = diff ? '' : 'none';
     updateGuessesLeft();
     clearFeedback();
     enableGuessing();
