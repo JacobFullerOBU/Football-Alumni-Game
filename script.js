@@ -40,14 +40,18 @@ function applyFilters() {
     const timePeriod = document.getElementById('time-period-filter').value;
     const difficulty = document.getElementById('difficulty-filter').value;
     filteredPlayers = csvPlayers.filter(player => {
-        let matchTime = (timePeriod === 'all' || (player.time_period && player.time_period === timePeriod));
-        let matchDifficulty = (difficulty === 'all' || (player.difficulty && player.difficulty === difficulty));
+        // Treat missing values as 'all'
+        let playerTime = player.time_period ? player.time_period : 'all';
+        let playerDifficulty = player.difficulty ? player.difficulty : 'all';
+        let matchTime = (timePeriod === 'all' || playerTime === timePeriod || playerTime === 'all');
+        let matchDifficulty = (difficulty === 'all' || playerDifficulty === difficulty || playerDifficulty === 'all');
         return matchTime && matchDifficulty;
     });
 }
 
 // Update uniqueColleges for dropdown
 let uniqueColleges = [];
+// --- Ensure mode buttons are enabled only after CSV is loaded ---
 async function initGame() {
     await loadPlayersFromCSV();
     uniqueColleges = [...new Set(csvPlayers.map(player => player.college))].sort();
@@ -62,7 +66,14 @@ async function initGame() {
     document.getElementById('game-container').style.display = 'none';
     updateScore();
     updateRunningScore();
+    // Enable mode buttons
+    document.querySelectorAll('.mode-btn').forEach(btn => btn.disabled = false);
 }
+
+// Disable mode buttons until CSV is loaded
+window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.mode-btn').forEach(btn => btn.disabled = true);
+});
 
 function startGame(selectedModeKey) {
     applyFilters();
