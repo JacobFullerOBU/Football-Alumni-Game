@@ -34,6 +34,7 @@ function generatePlayerImageURL(playerName) {
     return 'data:image/svg+xml;base64,' + btoa(svg);
 }
 // --- FILTER LOGIC ---
+let players = [];
 let filteredPlayers = [];
 
 function applyFilters() {
@@ -94,8 +95,8 @@ let previousGuesses = [];
 let gameActive = true;
 let usedPlayers = [];
 
-// Extract unique colleges for dropdown (will be updated after CSV loads)
-let uniqueColleges = [...new Set(players.map(player => player.college))].sort();
+// Extract unique colleges for dropdown (populated after CSV loads in initGame)
+let uniqueColleges = [];
 
 // DOM elements
 const scoreElement = document.getElementById('score');
