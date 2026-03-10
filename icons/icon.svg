@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#080d14"/>
+  <!-- Gold border -->
+  <rect x="16" y="16" width="480" height="480" rx="0" fill="none" stroke="#FFB800" stroke-width="14"/>
+  <!-- Football shape -->
+  <ellipse cx="256" cy="220" rx="110" ry="72" fill="none" stroke="#FFB800" stroke-width="12"/>
+  <!-- Laces -->
+  <line x1="256" y1="160" x2="256" y2="280" stroke="#FFB800" stroke-width="6"/>
+  <line x1="224" y1="195" x2="288" y2="195" stroke="#FFB800" stroke-width="5"/>
+  <line x1="224" y1="220" x2="288" y2="220" stroke="#FFB800" stroke-width="5"/>
+  <line x1="224" y1="245" x2="288" y2="245" stroke="#FFB800" stroke-width="5"/>
+  <!-- Text -->
+  <text x="256" y="360" font-family="Arial Black, Impact, sans-serif" font-size="52" font-weight="900"
+        text-anchor="middle" fill="#FFB800" letter-spacing="2">ALUMNI</text>
+  <text x="256" y="420" font-family="Arial Black, Impact, sans-serif" font-size="34" font-weight="700"
+        text-anchor="middle" fill="#9baabb" letter-spacing="3">GAME</text>
+</svg>
