@@ -39,112 +39,18 @@ let filteredPlayers = [];
 function applyFilters() {
     const timePeriod = document.getElementById('time-period-filter').value;
     const difficulty = document.getElementById('difficulty-filter').value;
-    filteredPlayers = players.filter(player => {
+    filteredPlayers = csvPlayers.filter(player => {
         let matchTime = (timePeriod === 'all' || (player.time_period && player.time_period === timePeriod));
         let matchDifficulty = (difficulty === 'all' || (player.difficulty && player.difficulty === difficulty));
         return matchTime && matchDifficulty;
     });
 }
 
-// Update loadPlayersFromCSV to parse new columns
-document.addEventListener('DOMContentLoaded', () => {
-    const timePeriodFilter = document.getElementById('time-period-filter');
-    const difficultyFilter = document.getElementById('difficulty-filter');
-    if (timePeriodFilter && difficultyFilter) {
-        timePeriodFilter.addEventListener('change', applyFilters);
-        difficultyFilter.addEventListener('change', applyFilters);
-    }
-});
-
-async function loadPlayersFromCSV() {
-    try {
-        const response = await fetch('players_with_images.csv');
-        const csvText = await response.text();
-        const lines = csvText.trim().split('\n');
-        const headers = lines[0].split(',');
-        for (let i = 1; i < lines.length; i++) {
-            const line = lines[i];
-            if (!line.trim()) continue;
-            const values = line.match(/(?:"[^"]*"|[^,])+/g) || line.split(',');
-            const clean = values.map(v => v.replace(/^"|"$/g, ''));
-            let name = clean[0];
-            let college = clean[1];
-            let image = clean[2] || '';
-            let time_period = clean[3] || '';
-            let difficulty = clean[4] || '';
-            if (image && !image.startsWith('http')) image = '';
-            const player = { name, college, image, time_period, difficulty };
-            players.push(player);
-        }
-        applyFilters();
-        console.log(`Loaded ${lines.length - 1} players from CSV`);
-    } catch (error) {
-        console.error('Error loading CSV:', error);
-    }
-}
-
-// Game state
-let currentPlayer = null;
-let score = 0;
-let correctAnswers = 0;
-let incorrectAnswers = 0;
-let totalPlayers = 0;
-let guessesLeft = 3;
-let previousGuesses = [];
-let gameActive = true;
-let usedPlayers = [];
-
-// Extract unique colleges for dropdown (will be updated after CSV loads)
-let uniqueColleges = [...new Set(players.map(player => player.college))].sort();
-
-// DOM elements
-const scoreElement = document.getElementById('score');
-const correctCountElement = document.getElementById('correct-count');
-const incorrectCountElement = document.getElementById('incorrect-count');
-const totalCountElement = document.getElementById('total-count');
-const guessesLeftElement = document.getElementById('guesses-left');
-const playerImgElement = document.getElementById('player-img');
-const playerNameElement = document.getElementById('player-name');
-const guessInputElement = document.getElementById('guess-input');
-const collegeDropdownElement = document.getElementById('college-dropdown');
-const submitGuessButton = document.getElementById('submit-guess');
-const passButton = document.getElementById('pass-button');
-const feedbackElement = document.getElementById('feedback');
-const previousGuessesElement = document.getElementById('previous-guesses');
-const nextPlayerButton = document.getElementById('next-player');
-const restartGameButton = document.getElementById('restart-game');
-const gameOverElement = document.getElementById('game-over');
-const finalScoreElement = document.getElementById('final-score');
-const playAgainButton = document.getElementById('play-again');
-
-// Game Modes
-const gameModes = {
-    training: {
-        name: "Training Camp",
-        timeLimit: null,      // No timer
-        globalLives: false,   // Lives reset every new player
-        startingLives: 3      // 3 guesses per player
-    },
-    season: {
-        name: "Regular Season",
-        timeLimit: 15,        // 15 seconds per player
-        globalLives: true,    // Lives carry over (Total health)
-        startingLives: 3      // 3 lives TOTAL for the whole game
-    },
-    suddenDeath: {
-        name: "Sudden Death",
-        timeLimit: 5,         // 5 seconds per player
-        globalLives: true,    // Lives carry over
-        startingLives: 1      // 1 mistake and game over
-    }
-};
-let currentMode = gameModes.training;
-let currentLives = currentMode.startingLives;
-let timerInterval;
-
+// Update uniqueColleges for dropdown
+let uniqueColleges = [];
 async function initGame() {
     await loadPlayersFromCSV();
-    uniqueColleges = [...new Set(players.map(player => player.college))].sort();
+    uniqueColleges = [...new Set(csvPlayers.map(player => player.college))].sort();
     score = 0;
     correctAnswers = 0;
     incorrectAnswers = 0;
@@ -159,7 +65,6 @@ async function initGame() {
 }
 
 function startGame(selectedModeKey) {
-    // Apply filters before starting
     applyFilters();
     if (!filteredPlayers || filteredPlayers.length === 0) {
         alert('No players match your selected filters. Please try a different combination.');
