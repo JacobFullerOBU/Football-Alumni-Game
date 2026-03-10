@@ -140,6 +140,7 @@ const gameModes = {
     }
 };
 let currentMode = gameModes.training;
+let currentModeKey = 'training';
 let currentLives = currentMode.startingLives;
 let timerInterval;
 
@@ -166,6 +167,7 @@ function startGame(selectedModeKey) {
         alert('No players match your selected filters. Please try a different combination.');
         return;
     }
+    currentModeKey = selectedModeKey;
     currentMode = gameModes[selectedModeKey];
     currentLives = currentMode.startingLives;
     document.getElementById('mode-selection').style.display = 'none';
@@ -233,6 +235,41 @@ function triggerGameOver() {
     document.querySelector('.game-area').classList.add('hidden');
     gameOverElement.classList.remove('hidden');
     document.getElementById('timer-display').innerText = '';
+    // Pre-fill name input if previously used
+    const saved = localStorage.getItem('lb_last_name');
+    if (saved) document.getElementById('player-name-input').value = saved;
+    document.getElementById('player-name-input').focus();
+    renderLeaderboard(currentModeKey);
+}
+
+// --- LEADERBOARD ---
+
+function getLeaderboard(modeKey) {
+    return JSON.parse(localStorage.getItem('leaderboard_' + modeKey) || '[]');
+}
+
+function saveToLeaderboard(modeKey, name, playerScore) {
+    const board = getLeaderboard(modeKey);
+    board.push({ name, score: playerScore, date: new Date().toLocaleDateString() });
+    board.sort((a, b) => b.score - a.score);
+    board.splice(10); // Keep top 10
+    localStorage.setItem('leaderboard_' + modeKey, JSON.stringify(board));
+}
+
+function renderLeaderboard(modeKey) {
+    const board = getLeaderboard(modeKey);
+    const list = document.getElementById('leaderboard-list');
+    list.innerHTML = '';
+    if (board.length === 0) {
+        list.innerHTML = '<li class="lb-empty">No scores yet. Be the first!</li>';
+        return;
+    }
+    board.forEach((entry, i) => {
+        const li = document.createElement('li');
+        li.className = 'lb-entry' + (i === 0 ? ' lb-gold' : i === 1 ? ' lb-silver' : i === 2 ? ' lb-bronze' : '');
+        li.innerHTML = `<span class="lb-rank">#${i + 1}</span><span class="lb-name">${entry.name}</span><span class="lb-score">${entry.score} pts</span><span class="lb-date">${entry.date}</span>`;
+        list.appendChild(li);
+    });
 }
 
 function loadNewPlayer() {
@@ -552,9 +589,49 @@ restartGameButton.addEventListener('click', function() {
     }
 });
 playAgainButton.addEventListener('click', initGame);
+
+// Save score to leaderboard
+document.getElementById('save-score-btn').addEventListener('click', function() {
+    const nameInput = document.getElementById('player-name-input');
+    const name = nameInput.value.trim() || 'Anonymous';
+    localStorage.setItem('lb_last_name', name);
+    saveToLeaderboard(currentModeKey, name, score);
+    renderLeaderboard(currentModeKey);
+    nameInput.value = '';
+    this.textContent = 'Saved!';
+    this.disabled = true;
+    setTimeout(() => { this.textContent = 'Save Score'; this.disabled = false; }, 2000);
+});
+
+// Allow pressing Enter in the name input to save
+document.getElementById('player-name-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('save-score-btn').click();
+});
+
+// Leaderboard tabs
+document.querySelectorAll('.lb-tab').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.lb-tab').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        renderLeaderboard(this.dataset.mode);
+    });
+});
+
+// Clear leaderboard
+document.getElementById('clear-leaderboard-btn').addEventListener('click', function() {
+    if (confirm('Clear all leaderboard scores?')) {
+        ['training', 'season', 'suddenDeath'].forEach(k => localStorage.removeItem('leaderboard_' + k));
+        const activeTab = document.querySelector('.lb-tab.active');
+        renderLeaderboard(activeTab ? activeTab.dataset.mode : 'training');
+    }
+});
+
 // Handle image loading errors
 playerImgElement.addEventListener('error', function() {
     this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTAwIDEwMEM4MS4wNDI5IDEwMCA2NiA4NC45NTcxIDY2IDY2QzY2IDQ3LjA0MjkgODEuMDQyOSAzMiAxMDAgMzJDMTE4Ljk1NyAzMiAxMzQgNDcuMDQyOSAxMzQgNjZDMTM0IDg0Ljk1NzEgMTE4Ljk1NyAxMDAgMTAwIDEwMFpNMTAwIDEzNEM4MS4wNDI5IDEzNCA2NiAxNDkuMDQzIDY2IDE2OEg0NkM0NiAxMzguMDcyIDcwLjA3MjEgMTE0IDEwMCAxMTRDMTI5LjkyOCAxMTQgMTU0IDEzOC4wNzIgMTU0IDE2OEgxMzRDMTM0IDE0OS4wNDMgMTE4Ljk1NyAxMzQgMTAwIDEzNFoiIGZpbGw9IiM5Q0E0QUYiLz4KPC9zdmc+';
 });
 // Initialize the game when page loads
-document.addEventListener('DOMContentLoaded', initGame);
+document.addEventListener('DOMContentLoaded', () => {
+    initGame();
+    renderLeaderboard('training');
+});

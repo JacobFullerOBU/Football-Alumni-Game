@@ -97,7 +97,24 @@
         <div class="game-over" id="game-over" class="hidden">
             <h2>Game Over!</h2>
             <p>Final Score: <span id="final-score">0</span></p>
+            <div class="name-entry">
+                <label for="player-name-input">Enter your name for the leaderboard:</label>
+                <input type="text" id="player-name-input" placeholder="Your name..." maxlength="20" autocomplete="off">
+                <button id="save-score-btn">Save Score</button>
+            </div>
             <button id="play-again">Play Again</button>
+        </div>
+
+        <!-- Leaderboard -->
+        <div id="leaderboard-section" class="leaderboard-section">
+            <h2>Leaderboard</h2>
+            <div class="leaderboard-tabs">
+                <button class="lb-tab active" data-mode="training">Training Camp</button>
+                <button class="lb-tab" data-mode="season">Regular Season</button>
+                <button class="lb-tab" data-mode="suddenDeath">Sudden Death</button>
+            </div>
+            <ol id="leaderboard-list" class="leaderboard-list"></ol>
+            <button id="clear-leaderboard-btn">Clear Leaderboard</button>
         </div>
     </div>
     
