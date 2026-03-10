@@ -19,6 +19,22 @@
         
         <div id="mode-selection" class="mode-selection">
             <h2 class="mode-title">Select Difficulty</h2>
+            <div class="filter-section">
+                <label for="time-period-filter">Time Period:</label>
+                <select id="time-period-filter">
+                    <option value="all">All</option>
+                    <option value="2000s">2000s</option>
+                    <option value="2010s">2010s</option>
+                    <option value="2020s">2020s</option>
+                </select>
+                <label for="difficulty-filter">Difficulty:</label>
+                <select id="difficulty-filter">
+                    <option value="all">All</option>
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+            </div>
             <div class="mode-buttons">
                 <button class="mode-btn training" onclick="startGame('training')">
                     <span class="mode-name">Training Camp</span>

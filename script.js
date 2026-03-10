@@ -429,36 +429,53 @@ let players = [
     }
 ];
 
-// Function to load players from CSV file
+// --- FILTER LOGIC ---
+let filteredPlayers = [];
+
+function applyFilters() {
+    const timePeriod = document.getElementById('time-period-filter').value;
+    const difficulty = document.getElementById('difficulty-filter').value;
+    filteredPlayers = players.filter(player => {
+        let matchTime = (timePeriod === 'all' || (player.time_period && player.time_period === timePeriod));
+        let matchDifficulty = (difficulty === 'all' || (player.difficulty && player.difficulty === difficulty));
+        return matchTime && matchDifficulty;
+    });
+}
+
+// Update loadPlayersFromCSV to parse new columns
+document.addEventListener('DOMContentLoaded', () => {
+    const timePeriodFilter = document.getElementById('time-period-filter');
+    const difficultyFilter = document.getElementById('difficulty-filter');
+    if (timePeriodFilter && difficultyFilter) {
+        timePeriodFilter.addEventListener('change', applyFilters);
+        difficultyFilter.addEventListener('change', applyFilters);
+    }
+});
+
 async function loadPlayersFromCSV() {
     try {
         const response = await fetch('players_with_images.csv');
         const csvText = await response.text();
-        
-        // Parse CSV manually (simple parser for our format)
         const lines = csvText.trim().split('\n');
         const headers = lines[0].split(',');
-        
         for (let i = 1; i < lines.length; i++) {
             const line = lines[i];
             if (!line.trim()) continue;
-            // Use a regex to split only on commas not inside quotes
             const values = line.match(/(?:"[^"]*"|[^,])+/g) || line.split(',');
-            // Remove quotes from values
             const clean = values.map(v => v.replace(/^"|"$/g, ''));
-            // If more than 3 columns, join the rest as image_url (handles commas in college names)
             let name = clean[0];
             let college = clean[1];
-            let image = clean.slice(2).join(',').trim();
+            let image = clean[2] || '';
+            let time_period = clean[3] || '';
+            let difficulty = clean[4] || '';
             if (image && !image.startsWith('http')) image = '';
-            const player = { name, college, image };
+            const player = { name, college, image, time_period, difficulty };
             players.push(player);
         }
-        
+        applyFilters();
         console.log(`Loaded ${lines.length - 1} players from CSV`);
     } catch (error) {
         console.error('Error loading CSV:', error);
-        // Continue with hardcoded players if CSV fails to load
     }
 }
 
@@ -608,16 +625,16 @@ function triggerGameOver() {
 }
 
 function loadNewPlayer() {
-    if (usedPlayers.length >= players.length) {
+    if (usedPlayers.length >= filteredPlayers.length) {
         triggerGameOver();
         return;
     }
     guessesLeft = currentMode.globalLives ? currentLives : currentMode.startingLives;
     previousGuesses = [];
-    let availablePlayers = players.filter((_, index) => !usedPlayers.includes(index));
+    let availablePlayers = filteredPlayers.filter((_, index) => !usedPlayers.includes(index));
     let randomIndex = Math.floor(Math.random() * availablePlayers.length);
     currentPlayer = availablePlayers[randomIndex];
-    let originalIndex = players.findIndex(p => p.name === currentPlayer.name);
+    let originalIndex = filteredPlayers.findIndex(p => p.name === currentPlayer.name);
     usedPlayers.push(originalIndex);
     playerNameElement.textContent = currentPlayer.name;
     playerImgElement.src = currentPlayer.image || generatePlayerImageURL(currentPlayer.name);
