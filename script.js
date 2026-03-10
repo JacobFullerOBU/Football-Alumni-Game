@@ -455,8 +455,8 @@ function endGame() {
 
 
 // Event listeners
-submitGuessButton.addEventListener('click', submitGuess);
-passButton.addEventListener('click', passPlayer);
+//submitGuessButton.addEventListener('click', submitGuess);
+//passButton.addEventListener('click', passPlayer);
 
 // Provided code: Add Enter key support for guess input
 const inputField = document.querySelector('input[type="text"]');
