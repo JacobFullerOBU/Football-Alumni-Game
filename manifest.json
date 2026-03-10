@@ -2,7 +2,7 @@
   "name": "Football Alumni Game",
   "short_name": "Alumni Game",
   "description": "Guess which college these NFL players attended!",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#080d14",

@@ -1,11 +1,11 @@
 const CACHE_NAME = 'alumni-game-v1';
 const ASSETS_TO_CACHE = [
-    '/',
-    '/index.html',
-    '/style.css',
-    '/script.js',
-    '/players_with_images.csv',
-    '/manifest.json'
+    './',
+    './index.html',
+    './style.css',
+    './script.js',
+    './players_with_images.csv',
+    './manifest.json'
 ];
 
 // Install: cache all core assets
