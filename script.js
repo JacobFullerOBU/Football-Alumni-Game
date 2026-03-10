@@ -94,6 +94,42 @@ let guessesLeft = 3;
 let previousGuesses = [];
 let gameActive = true;
 let usedPlayers = [];
+let timeLeft = 0;
+
+// College logo map — ESPN CDN IDs
+const collegeLogoMap = {
+    'Alabama': 333, 'Arizona': 12, 'Arizona State': 9, 'Arkansas': 8,
+    'Auburn': 2, 'Baylor': 239, 'Boston College': 103, 'California': 25,
+    'Clemson': 228, 'Colorado': 38, 'Colorado State': 36, 'Duke': 150,
+    'East Carolina': 151, 'Eastern Michigan': 2199, 'Eastern Washington': 331,
+    'Florida': 57, 'Florida State': 52, 'Fresno State': 278, 'Georgia': 61,
+    'Georgia Tech': 59, 'Houston': 248, 'Illinois': 356, 'Indiana': 84,
+    'Iowa': 2294, 'Iowa State': 66, 'Kansas': 2305, 'Kansas State': 2306,
+    'Kent State': 2309, 'Kentucky': 96, 'LSU': 99, 'Louisville': 97,
+    'Marshall': 276, 'Maryland': 120, 'Memphis': 235, 'Miami': 2390,
+    'Miami (OH)': 193, 'Michigan': 130, 'Michigan State': 127, 'Minnesota': 135,
+    'Mississippi State': 344, 'Missouri': 142, 'NC State': 152, 'Nebraska': 158,
+    'Nevada': 2440, 'New Mexico': 167, 'North Carolina': 153, 'North Dakota State': 2449,
+    'Northwestern': 77, 'Notre Dame': 87, 'Ohio': 195, 'Ohio State': 194,
+    'Oklahoma': 201, 'Oklahoma State': 197, 'Ole Miss': 145, 'Oregon': 2483,
+    'Oregon State': 204, 'Penn State': 213, 'Pittsburgh': 221, 'Purdue': 2509,
+    'Rutgers': 164, 'San Diego State': 21, 'SMU': 2567, 'South Carolina': 2579,
+    'Southern California': 30, 'Southern Mississippi': 2572, 'Stanford': 24,
+    'Syracuse': 183, 'TCU': 2628, 'Tennessee': 2633, 'Texas': 251,
+    'Texas A&M': 245, 'Texas Tech': 2641, 'Troy': 2653, 'Tulsa': 202,
+    'UCLA': 26, 'USC': 30, 'Utah': 254, 'Utah State': 328, 'Vanderbilt': 238,
+    'Virginia': 258, 'Virginia Tech': 259, 'Wake Forest': 154, 'Washington': 264,
+    'Washington State': 265, 'West Virginia': 277, 'Western Kentucky': 98,
+    'Western Michigan': 2711, 'Wisconsin': 275, 'Wyoming': 2751,
+    'Appalachian State': 2026, 'Arkansas State': 2032, 'Ball State': 2050,
+    'Boise State': 68, 'Bowling Green': 189, 'Buffalo': 2084,
+    'Central Michigan': 2117, 'Cincinnati': 2132, 'Connecticut': 41,
+    'Northern Illinois': 2459, 'Old Dominion': 2448, 'Temple': 218,
+    'Toledo': 2649, 'UTEP': 2638, 'Akron': 2006, 'Idaho': 70, 'Hawaii': 62,
+    'San Jose State': 23, 'UNLV': 2439, 'New Mexico State': 2396,
+    'Coastal Carolina': 324, 'Liberty': 2335, 'James Madison': 256,
+    'Sam Houston State': 2534, 'South Alabama': 6,
+};
 
 // Extract unique colleges for dropdown (populated after CSV loads in initGame)
 let uniqueColleges = [];
@@ -185,12 +221,16 @@ function startGame(selectedModeKey) {
 
 function startTimer() {
     if (currentMode.timeLimit === null) return;
-    let timeLeft = currentMode.timeLimit;
+    timeLeft = currentMode.timeLimit;
+    resumeTimer();
+}
+
+function resumeTimer() {
+    if (currentMode.timeLimit === null) return;
     const timerDisplay = document.getElementById("timer-display");
-    timerDisplay.innerText = `Time: ${timeLeft}s`;
     clearInterval(timerInterval);
-    timerDisplay.classList.remove('urgent');
     timerDisplay.innerText = `${timeLeft}`;
+    timerDisplay.classList.toggle('urgent', timeLeft <= 5);
     timerInterval = setInterval(() => {
         timeLeft--;
         timerDisplay.innerText = `${timeLeft}`;
@@ -348,10 +388,15 @@ function populateCollegeDropdown(filter = '') {
         return;
     }
     
-    filteredColleges.slice(0, 10).forEach(college => { // Limit to 10 results
+    filteredColleges.slice(0, 15).forEach(college => {
         const option = document.createElement('div');
         option.className = 'dropdown-option';
-        option.textContent = college;
+        option.dataset.college = college;
+        const logoId = collegeLogoMap[college];
+        const logoHtml = logoId
+            ? `<img class="dropdown-logo" src="https://a.espncdn.com/i/teamlogos/ncaa/500/${logoId}.png" alt="" onerror="this.style.display='none'">`
+            : `<span class="dropdown-logo-placeholder"></span>`;
+        option.innerHTML = `${logoHtml}<span class="dropdown-college-name">${college}</span>`;
         option.addEventListener('click', () => selectCollege(college));
         collegeDropdownElement.appendChild(option);
     });
@@ -507,10 +552,15 @@ function submitGuess() {
     } else {
         // Incorrect guess
         if (guessesLeft > 0) {
-            feedbackElement.textContent = `Incorrect. Try again!`;
+            const timeBonus = currentMode.timeLimit !== null ? ' (+10s)' : '';
+            feedbackElement.textContent = `Incorrect. Try again!${timeBonus}`;
             feedbackElement.className = 'feedback incorrect';
             previousGuessesElement.textContent = `Previous guesses: ${previousGuesses.join(', ')}`;
             guessInputElement.value = '';
+            if (currentMode.timeLimit !== null) {
+                timeLeft += 10;
+                resumeTimer();
+            }
         } else {
             // No guesses left
             incorrectAnswers++;
@@ -578,7 +628,7 @@ inputField.addEventListener("keydown", function(event) {
   } else if (event.key === "Enter") {
     event.preventDefault();
     if (isOpen && dropdownHighlightIndex >= 0) {
-      selectCollege(options[dropdownHighlightIndex].textContent);
+      selectCollege(options[dropdownHighlightIndex].dataset.college);
     } else {
       submitBtn.click();
     }
@@ -586,7 +636,7 @@ inputField.addEventListener("keydown", function(event) {
     if (isOpen) {
       event.preventDefault();
       const target = dropdownHighlightIndex >= 0 ? options[dropdownHighlightIndex] : options[0];
-      selectCollege(target.textContent);
+      selectCollege(target.dataset.college);
     }
   }
 });

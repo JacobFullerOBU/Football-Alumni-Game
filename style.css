@@ -260,7 +260,7 @@ header p:first-of-type {
     line-height: 1;
 }
 
-.timer-display.timer-warning {
+.timer-display.urgent {
     color: #E63946;
     text-shadow: 0 0 20px rgba(230,57,70,0.6);
     animation: timerPulse 0.5s ease-in-out infinite alternate;
@@ -395,13 +395,13 @@ header p:first-of-type {
 
 #guess-input {
     width: 100%;
-    padding: 13px 16px;
+    padding: 17px 18px;
     background: #141e2e;
     border: 1px solid #2a3d52;
     border-bottom: 2px solid #FFB800;
     color: #f0f0f0;
     font-family: 'Inter', sans-serif;
-    font-size: 0.95rem;
+    font-size: 1.1rem;
     outline: none;
     transition: border-color 0.2s, background-color 0.2s;
 }
@@ -423,7 +423,7 @@ header p:first-of-type {
     background: #141e2e;
     border: 1px solid #2a3d52;
     border-top: none;
-    max-height: 220px;
+    max-height: 370px;
     overflow-y: auto;
     z-index: 100;
     box-shadow: 0 8px 24px rgba(0,0,0,0.5);
@@ -431,21 +431,45 @@ header p:first-of-type {
 
 .college-dropdown.hidden { display: none; }
 
-.college-option {
+.dropdown-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     padding: 10px 14px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: #c0cdd8;
     border-bottom: 1px solid #1a2636;
     transition: background 0.12s, color 0.12s;
 }
 
-.college-option:last-child { border-bottom: none; }
+.dropdown-option:last-child { border-bottom: none; }
 
-.college-option:hover,
-.college-option.highlighted {
+.dropdown-option:hover,
+.dropdown-option.dropdown-option-active {
     background: #1f3247;
     color: #FFB800;
+}
+
+.dropdown-logo {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    flex-shrink: 0;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+}
+
+.dropdown-logo-placeholder {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+}
+
+.dropdown-college-name {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Dropdown scrollbar */
