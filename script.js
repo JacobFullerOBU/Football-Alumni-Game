@@ -1,3 +1,30 @@
+// --- Restructure: All DOM-dependent code inside DOMContentLoaded ---
+document.addEventListener('DOMContentLoaded', () => {
+    // DOM elements
+    const scoreElement = document.getElementById('score');
+    const correctCountElement = document.getElementById('correct-count');
+    const incorrectCountElement = document.getElementById('incorrect-count');
+    const totalCountElement = document.getElementById('total-count');
+    const guessesLeftElement = document.getElementById('guesses-left');
+    const playerImgElement = document.getElementById('player-img');
+    const playerNameElement = document.getElementById('player-name');
+    const guessInputElement = document.getElementById('guess-input');
+    const collegeDropdownElement = document.getElementById('college-dropdown');
+    const submitGuessButton = document.getElementById('submit-guess');
+    const passButton = document.getElementById('pass-button');
+    const feedbackElement = document.getElementById('feedback');
+    const previousGuessesElement = document.getElementById('previous-guesses');
+    const nextPlayerButton = document.getElementById('next-player');
+    const restartGameButton = document.getElementById('restart-game');
+    const gameOverElement = document.getElementById('game-over');
+    const finalScoreElement = document.getElementById('final-score');
+    const playAgainButton = document.getElementById('play-again');
+
+    // All game logic, event listeners, and variable assignments go here
+    // Move all functions and game state inside this block
+    // ...existing code...
+});
+
 // Helper function to generate player image URL
 function generatePlayerImageURL(playerName) {
     // Generate player initials
@@ -33,6 +60,7 @@ function generatePlayerImageURL(playerName) {
     // Return as data URL
     return 'data:image/svg+xml;base64,' + btoa(svg);
 }
+
 // --- FILTER LOGIC ---
 let filteredPlayers = [];
 
