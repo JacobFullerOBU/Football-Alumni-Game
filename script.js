@@ -70,9 +70,9 @@ async function loadPlayersFromCSV() {
             const clean = values.map(v => v.replace(/^"|"$/g, ''));
             let name = clean[0];
             let college = clean[1];
-            let image = clean[2] || '';
-            let time_period = clean[3] || '';
-            let difficulty = clean[4] || '';
+            let time_period = clean[2] || '';
+            let difficulty = clean[3] || '';
+            let image = clean[4] || '';
             if (image && !image.startsWith('http')) image = '';
             const player = { name, college, image, time_period, difficulty };
             players.push(player);
@@ -515,10 +515,16 @@ passButton.addEventListener('click', passPlayer);
 // Provided code: Add Enter key support for guess input
 const inputField = document.querySelector('input[type="text"]');
 const submitBtn = document.getElementById('submit-guess');
-inputField.addEventListener("keypress", function(event) {
+inputField.addEventListener("keydown", function(event) {
   if (event.key === "Enter") {
     event.preventDefault();
     submitBtn.click();
+  } else if (event.key === "Tab") {
+    const firstOption = collegeDropdownElement.querySelector('.dropdown-option');
+    if (firstOption && !collegeDropdownElement.classList.contains('hidden')) {
+      event.preventDefault();
+      selectCollege(firstOption.textContent);
+    }
   }
 });
 
