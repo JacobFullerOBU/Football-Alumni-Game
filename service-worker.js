@@ -1,17 +1,17 @@
 const CACHE_NAME = 'alumni-game-v1';
-const ASSETS_TO_CACHE = [
-    './',
-    './index.html',
-    './style.css',
-    './script.js',
-    './players_with_images.csv',
-    './manifest.json'
-];
 
 // Install: cache all core assets
 self.addEventListener('install', event => {
+    const base = self.registration.scope;
     event.waitUntil(
-        caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS_TO_CACHE))
+        caches.open(CACHE_NAME).then(cache => cache.addAll([
+            base,
+            base + 'index.html',
+            base + 'style.css',
+            base + 'script.js',
+            base + 'players_with_images.csv',
+            base + 'manifest.json'
+        ]))
     );
     self.skipWaiting();
 });
