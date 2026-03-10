@@ -72,30 +72,32 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function loadPlayersFromCSV() {
-    try {
-        const response = await fetch('players_with_images.csv');
-        const csvText = await response.text();
-        const lines = csvText.trim().split('\n');
-        const headers = lines[0].split(',');
-        for (let i = 1; i < lines.length; i++) {
-            const line = lines[i];
-            if (!line.trim()) continue;
-            const values = line.match(/(?:"[^"]*"|[^,])+/g) || line.split(',');
-            const clean = values.map(v => v.replace(/^"|"$/g, ''));
-            let name = clean[0];
-            let college = clean[1];
-            let time_period = clean[2] || '';
-            let difficulty = clean[3] || '';
-            let image = clean[4] || '';
-            if (image && !image.startsWith('http')) image = '';
-            const player = { name, college, image, time_period, difficulty };
-            players.push(player);
-        }
-        applyFilters();
-        console.log(`Loaded ${lines.length - 1} players from CSV`);
-    } catch (error) {
-        console.error('Error loading CSV:', error);
-    }
+    return new Promise((resolve, reject) => {
+        Papa.parse('players_with_images.csv', {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            transformHeader: h => h.trim().toLowerCase().replace(/\s+/g, '_'),
+            complete: results => {
+                players = results.data.map(row => ({
+                    name:        (row['name'] || '').trim(),
+                    college:     (row['college'] || '').trim(),
+                    time_period: (row['time_period'] || '').trim(),
+                    difficulty:  (row['difficulty'] || '').trim(),
+                    image:       (row['image_url'] || '').trim().startsWith('http')
+                                     ? (row['image_url'] || '').trim()
+                                     : ''
+                })).filter(p => p.name);
+                applyFilters();
+                console.log(`Loaded ${players.length} players from CSV`);
+                resolve();
+            },
+            error: err => {
+                console.error('Error loading CSV:', err);
+                reject(err);
+            }
+        });
+    });
 }
 
 // Game state
@@ -195,6 +197,7 @@ let currentLives = currentMode.startingLives;
 let timerInterval;
 
 async function initGame() {
+    players = [];
     await loadPlayersFromCSV();
     uniqueColleges = [...new Set(players.map(player => player.college))].sort();
     score = 0;
@@ -362,7 +365,7 @@ function loadNewPlayer() {
     usedPlayers.push(originalIndex);
     playerNameElement.textContent = currentPlayer.name;
     playerImgElement.src = currentPlayer.image || generatePlayerImageURL(currentPlayer.name);
-    playerImgElement.alt = currentPlayer.name;
+    playerImgElement.alt = '';
     const badge = document.getElementById('difficulty-badge');
     const diff = (currentPlayer.difficulty || '').toLowerCase();
     badge.textContent = diff ? diff.charAt(0).toUpperCase() + diff.slice(1) : '';
