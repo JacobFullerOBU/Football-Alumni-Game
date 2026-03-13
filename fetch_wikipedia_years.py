@@ -8,7 +8,7 @@ Just set INPUT_FILE below to your CSV path and run:
 """
 
 # ─── SET YOUR FILE PATH HERE ──────────────────────────────────────────────────
-INPUT_FILE = "players_with_images.csv"   # <- change this to your file path
+INPUT_FILE = "players_needing_years.csv"   # <- change this to your file path
 # ─────────────────────────────────────────────────────────────────────────────
 
 import csv
@@ -172,7 +172,7 @@ def main():
             print(f"✓  {period:8s} ({source})")
 
         # Be polite to Wikipedia — don't hammer their servers
-        time.sleep(0.3)
+        time.sleep(2.5)
 
     # Write enriched CSV
     out_path = input_path.parent / (input_path.stem + "_enriched.csv")
