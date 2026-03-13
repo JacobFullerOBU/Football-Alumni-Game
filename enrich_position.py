@@ -256,7 +256,7 @@ def main():
             failed += 1
             print(f"❌ unknown | {note}")
 
-        time.sleep(0.35)
+        time.sleep(1.5)
 
     # ── Write back in place ───────────────────────────────────────
     with open(input_path, "w", newline="", encoding="utf-8") as f:
